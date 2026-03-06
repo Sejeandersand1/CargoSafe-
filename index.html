@@ -1,0 +1,4672 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CargoSafe</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#101b31;
+      --card2:#0f1a2e;
+      --text:#eaf0ff;
+      --muted:#a9b7d6;
+      --line:rgba(255,255,255,.10);
+      --primary:#4da3ff;
+      --primary2:#71ffd4;
+      --danger:#ff5a7a;
+      --ok:#43f38a;
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% 10%, rgba(77,163,255,.25), transparent 60%),
+        radial-gradient(900px 500px at 90% 20%, rgba(113,255,212,.15), transparent 55%),
+        radial-gradient(900px 700px at 60% 90%, rgba(255,90,122,.10), transparent 60%),
+        var(--bg);
+      min-height:100vh;
+    }
+
+    header{
+      padding:20px 22px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:1px solid var(--line);
+      backdrop-filter: blur(6px);
+      position: sticky;
+      top:0;
+      background: rgba(11,18,32,.60);
+      z-index:10;
+    }
+    .brand{
+      display:flex; gap:12px; align-items:center;
+    }
+    .logo{
+      width:38px; height:38px; border-radius:12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      box-shadow: 0 10px 30px rgba(77,163,255,.25);
+      position: relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:9px;
+      border-radius:10px;
+      border:1px solid rgba(11,18,32,.35);
+      background: rgba(11,18,32,.35);
+    }
+    .brand h1{
+      font-size:18px; margin:0; letter-spacing:.4px;
+    }
+    .brand p{
+      margin:2px 0 0; font-size:12px; color:var(--muted);
+    }
+    .right-actions{
+      display:flex; gap:10px; align-items:center;
+    }
+    .pill{
+      font-size:12px;
+      color:var(--muted);
+      border:1px solid var(--line);
+      padding:8px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.03);
+    }
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      transition:.15s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.08); }
+    .btn.primary{
+      border-color: rgba(77,163,255,.45);
+      background: rgba(77,163,255,.18);
+    }
+    .btn.danger{
+      border-color: rgba(255,90,122,.45);
+      background: rgba(255,90,122,.12);
+    }
+
+  main{
+  padding:24px 18px 60px;
+  max-width:1400px;  /* eller 1600px hvis du vil have den endnu bredere */
+  margin:0 auto;
+}
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:16px;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:18px 18px 14px;
+      border-bottom:1px solid var(--line);
+      background: rgba(16,27,49,.55);
+    }
+    .card .hd h2{
+      margin:0;
+      font-size:16px;
+      letter-spacing:.2px;
+    }
+    .card .hd p{
+      margin:6px 0 0;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+    .card .bd{
+      padding:18px;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    @media (max-width: 700px){
+      .row{ grid-template-columns: 1fr; }
+    }
+
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+      letter-spacing:.2px;
+    }
+
+    .field{
+      position:relative;
+    }
+
+    input, select, textarea{
+      width:100%;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      outline:none;
+      transition:.15s ease;
+    }
+    textarea{ min-height: 92px; resize: vertical; }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(77,163,255,.45);
+      box-shadow: 0 0 0 4px rgba(77,163,255,.12);
+    }
+
+    .info-btn{
+      position:absolute;
+      top: 30px;
+      right: 10px;
+      width:28px;
+      height:28px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      color:var(--text);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+    }
+    .info-btn:hover{ background: rgba(255,255,255,.08); }
+
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+      border:1px dashed rgba(255,255,255,.14);
+      padding:10px 12px;
+      border-radius:12px;
+      background: rgba(0,0,0,.10);
+    }
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+    .tab{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      font-size:12px;
+    }
+    .tab.active{
+      border-color: rgba(113,255,212,.35);
+      background: rgba(113,255,212,.10);
+    }
+
+    .divider{
+      margin:14px 0;
+      height:1px;
+      background: var(--line);
+    }
+
+    .kpis{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    .kpi{
+      border:1px solid var(--line);
+      border-radius: 14px;
+      padding:12px;
+      background: rgba(255,255,255,.03);
+    }
+    .kpi .t{ font-size:12px; color:var(--muted); }
+    .kpi .v{ font-size:14px; margin-top:6px; }
+
+    .small{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.4;
+    }
+
+    /* Modal */
+    .modal-backdrop{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:100;
+      padding:18px;
+    }
+    .modal{
+      width:min(820px, 100%);
+      background: #0c1426;
+      border:1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modal .mhd{
+      padding:16px 16px 12px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .modal .mhd h3{ margin:0; font-size:15px; }
+    .modal .mbd{
+      padding:16px;
+      max-height: 65vh;
+      overflow:auto;
+      color: var(--text);
+    }
+    .close-x{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      border-radius: 12px;
+      padding:8px 10px;
+      cursor:pointer;
+    }
+
+    /* Login view */
+    .center{
+      min-height: calc(100vh - 80px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 26px 18px 60px;
+    }
+    .login-card{
+      width:min(520px, 100%);
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      color: var(--muted);
+      border:1px solid var(--line);
+      padding:8px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.03);
+    }
+    .dot{
+      width:8px; height:8px; border-radius:99px;
+      background: var(--ok);
+      box-shadow: 0 0 0 6px rgba(67,243,138,.10);
+    }
+
+    .hidden{ display:none !important; }
+
+    .toast{
+      border:1px solid rgba(255,90,122,.35);
+      background: rgba(255,90,122,.10);
+      padding:10px 12px;
+      border-radius: 14px;
+      font-size:12px;
+      color: var(--text);
+      margin-top: 10px;
+      display:none;
+    }
+
+    pre{
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      padding:12px;
+      border-radius:14px;
+      color: var(--text);
+      font-size:12px;
+      line-height:1.4;
+    }
+/* --- Fix: dropdown options skal være læselige (sort tekst på hvid liste) --- */
+select option {
+  color: #000;          /* sort tekst i dropdown-listen */
+  background: #fff;     /* hvid baggrund i listen */
+}
+
+/* Placeholder-option (første) må gerne være grå */
+select option[disabled] {
+  color: #666;
+}
+
+/* --- Ny: “dokument”-forhåndsvisning ala vedhæftet dokument --- */
+.doc-preview {
+  background: #fff;
+  color: #111;
+  border: 1px solid rgba(0,0,0,.12);
+  border-radius: 14px;
+  padding: 16px 16px 18px;
+  box-shadow: 0 12px 35px rgba(0,0,0,.18);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.doc-topline {
+  font-size: 12px;
+  color: #222;
+  margin-bottom: 10px;
+}
+
+.doc-hr {
+  height: 1px;
+  background: rgba(0,0,0,.18);
+  margin: 10px 0 12px;
+}
+
+.doc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 700px){
+  .doc-grid { grid-template-columns: 1fr; }
+}
+
+.doc-block h4 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: #111;
+  letter-spacing: .2px;
+}
+
+.doc-block p {
+  margin: 0;
+  font-size: 12px;
+  color: #111;
+  line-height: 1.35;
+}
+
+.doc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.doc-table th, .doc-table td {
+  border-bottom: 1px solid rgba(0,0,0,.12);
+  padding: 8px 6px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.doc-table th {
+  font-weight: 700;
+  color: #111;
+}
+
+.doc-muted {
+  color: #444;
+  font-size: 11px;
+}
+
+:root{
+  --bg: #07070a;
+  --bg2:#0c0c12;
+  --text:#f3f4f6;
+  --muted:#c7c9d1;
+  --stroke: rgba(255,255,255,.10);
+  --shadow: 0 22px 60px rgba(0,0,0,.55);
+
+  --red:#e11d2e;
+  --red2:#ff2d55;
+  --redGlow: rgba(225,29,46,.45);
+  --whiteGlow: rgba(255,255,255,.12);
+
+  --radius: 18px;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans";
+  color: var(--text);
+
+  /* BAGGRUNDSBILLEDE (som du sendte) */
+  background-image: url("bg.png");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  /* fallback hvis billedet ikke loader */
+  background-color: #07070a;
+}
+
+/* Topbar */
+.topbar{
+  position: sticky;
+  top:0;
+  z-index: 50;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 16px 22px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  background: rgba(6,6,10,.72);
+  backdrop-filter: blur(10px);
+}
+
+.brand{ display:flex; gap:10px; align-items:center; }
+.logo-badge{
+  width:34px; height:34px;
+  display:grid; place-items:center;
+  border-radius: 10px;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.25), transparent 55%),
+              linear-gradient(135deg, var(--red2), var(--red));
+  box-shadow: 0 16px 40px rgba(225,29,46,.35);
+  font-weight:800;
+}
+.brand-name{ font-weight:800; letter-spacing:.2px; }
+
+.nav{ display:flex; gap: 18px; align-items:center; }
+.nav-link{
+  border:0;
+  background: transparent;
+  color: rgba(255,255,255,.78);
+  font-weight:600;
+  cursor:pointer;
+  padding: 8px 2px;
+  position:relative;
+}
+.nav-link:hover{ color: #fff; }
+.nav-link.is-active{
+  color:#fff;
+}
+.nav-link.is-active::after{
+  content:"";
+  position:absolute;
+  left:0; right:0; bottom:-14px;
+  height:3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--red2), var(--red));
+  box-shadow: 0 10px 25px rgba(225,29,46,.35);
+}
+
+/* Buttons */
+.btn{
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+  color:#fff;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-weight:700;
+  cursor:pointer;
+  transition: transform .08s ease, filter .2s ease, background .2s ease, border-color .2s ease;
+}
+.btn:hover{ filter: brightness(1.05); }
+.btn:active{ transform: translateY(1px); }
+.btn-primary{
+  border-color: rgba(225,29,46,.55);
+  background: linear-gradient(135deg, var(--red2), var(--red));
+  box-shadow: 0 18px 45px rgba(225,29,46,.24);
+}
+.btn-ghost{
+  background: rgba(255,255,255,.06);
+}
+.btn-danger{
+  border-color: rgba(225,29,46,.55);
+  background: rgba(225,29,46,.12);
+}
+.btn-sm{ padding: 10px 14px; border-radius: 12px; }
+
+/* Layout */
+.page{
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 18px 70px;
+}
+
+/* Hero */
+.hero{
+  position:relative;
+  border-radius: 26px;
+  overflow:hidden;
+  padding: 46px 40px;
+  min-height: 360px;
+  display:grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 26px;
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: var(--shadow);
+  background:
+    radial-gradient(900px 500px at 75% 0%, rgba(255,45,85,.30), transparent 60%),
+    radial-gradient(700px 500px at 15% 70%, rgba(225,29,46,.20), transparent 60%),
+    linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+}
+.hero-bg{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(450px 250px at 80% 30%, rgba(255,255,255,.10), transparent 60%),
+    radial-gradient(700px 420px at 90% 60%, rgba(225,29,46,.22), transparent 60%);
+  pointer-events:none;
+}
+.hero-content{ position:relative; z-index:2; }
+.hero h1{
+  margin:0 0 12px;
+  font-size: clamp(34px, 4vw, 56px);
+  line-height: 1.02;
+}
+.hero p{
+  margin:0 0 22px;
+  color: rgba(255,255,255,.78);
+  max-width: 52ch;
+  font-size: 16px;
+}
+.hero-actions{ display:flex; gap: 12px; flex-wrap:wrap; }
+
+/* Hero visual mock */
+.hero-visual{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.mock-card{
+  width: 330px;
+  height: 230px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+  box-shadow: 0 20px 60px rgba(0,0,0,.45);
+  padding: 18px;
+  position:relative;
+}
+.mock-header{ display:flex; align-items:center; gap:10px; margin-bottom: 14px; }
+.mock-check{
+  width: 32px; height: 32px; border-radius: 10px;
+  display:grid; place-items:center;
+  background: rgba(225,29,46,.14);
+  border: 1px solid rgba(225,29,46,.45);
+  color: #fff;
+  font-weight:900;
+}
+.mock-line{
+  height: 10px; flex:1;
+  border-radius: 999px;
+  background: rgba(255,255,255,.14);
+}
+.mock-row{
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.10);
+  margin: 12px 0;
+}
+.mock-clock{
+  position:absolute;
+  right: -18px;
+  bottom: -18px;
+  width: 140px; height: 140px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), rgba(255,255,255,.05) 60%),
+              linear-gradient(135deg, rgba(255,45,85,.75), rgba(225,29,46,.55));
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 26px 80px rgba(225,29,46,.30);
+}
+.clock-face{
+  position:absolute; inset: 14px;
+  border-radius: 999px;
+  background: rgba(10,10,16,.55);
+  border: 1px solid rgba(255,255,255,.10);
+}
+.clock-hand{
+  position:absolute;
+  width: 3px; height: 44px;
+  left: 50%;
+  top: 28px;
+  transform: translateX(-50%) rotate(25deg);
+  transform-origin: bottom center;
+  background: #fff;
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.45);
+}
+.clock-24{
+  position:absolute;
+  bottom: 24px;
+  right: 22px;
+  font-weight: 900;
+  font-size: 30px;
+  color: #fff;
+}
+
+/* Section + card table */
+.section{ margin-top: 28px; }
+.section-head{
+  display:flex;
+  gap: 12px;
+  align-items:flex-start;
+  margin: 22px 2px 12px;
+}
+.section-icon{
+  width: 36px; height: 36px;
+  border-radius: 12px;
+  display:grid; place-items:center;
+  background: rgba(225,29,46,.12);
+  border: 1px solid rgba(225,29,46,.35);
+}
+.section h2{ margin:0; font-size: 26px; }
+.section p{ margin:6px 0 0; color: rgba(255,255,255,.70); }
+
+.card{
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+  box-shadow: var(--shadow);
+  padding: 14px;
+}
+.card-table{ padding: 14px 14px 12px; }
+
+.table{ width:100%; }
+.t-head, .t-row{
+  display:grid;
+  grid-template-columns: 140px 1.2fr 1fr 130px 150px 140px;
+  gap: 10px;
+  align-items:center;
+}
+.t-head{
+  padding: 12px 10px;
+  color: rgba(255,255,255,.72);
+  font-weight:700;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+}
+.t-row{
+  padding: 14px 10px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.t-row:last-child{ border-bottom:0; }
+
+.pill{
+  display:inline-flex;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.10);
+  color: rgba(255,255,255,.86);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.link-more{
+  margin-top: 10px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: rgba(255,255,255,.82);
+  font-weight: 800;
+  padding: 12px 10px;
+  cursor: pointer;
+  text-align:center;
+}
+.link-more:hover{ color:#fff; text-decoration: underline; }
+
+/* Responsive */
+@media (max-width: 980px){
+  .hero{ grid-template-columns: 1fr; }
+  .hero-visual{ justify-content:flex-start; }
+  .t-head{ display:none; }
+  .t-row{
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 16px 10px;
+  }
+  .nav{ display:none; } /* hvis du vil have burger-menu senere */
+}
+/* =========================================================
+   GLOBAL “GLASS UI” – GÆLDER ALLE STEDER
+   (samme look som din #adminUsersView/#specialView kode)
+   ========================================================= */
+
+/* Grundparametre */
+:root{
+  --glass-bg: rgba(0,0,0,.78);
+  --glass-border: rgba(255,255,255,.14);
+  --glass-shadow: 0 24px 80px rgba(0,0,0,.55);
+  --glass-hd: rgba(255,255,255,.06);
+  --glass-hd-border: rgba(255,255,255,.12);
+
+  --glow1: rgba(255,45,85,.18);
+  --glow2: rgba(225,29,46,.14);
+
+  --input-bg: rgba(255,255,255,.06);
+  --input-border: rgba(255,255,255,.16);
+
+  --btn-bg: rgba(255,255,255,.08);
+  --btn-border: rgba(255,255,255,.14);
+}
+
+/* 1) ALLE cards/panels */
+.card{
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 22px !important;
+  box-shadow: var(--glass-shadow) !important;
+  backdrop-filter: blur(10px) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* glød-lag bag indhold */
+.card::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  background:
+    radial-gradient(700px 320px at 80% 20%, var(--glow1), transparent 60%),
+    radial-gradient(600px 280px at 15% 65%, var(--glow2), transparent 60%);
+  z-index: 0;
+  pointer-events:none;
+}
+
+/* alt indhold over gløden */
+.card > *{
+  position: relative;
+  z-index: 1;
+}
+
+/* 2) Header inde i cards */
+.card .hd{
+  background: var(--glass-hd) !important;
+  border-bottom: 1px solid var(--glass-hd-border) !important;
+}
+.card .hd h1,
+.card .hd h2{
+  color:#fff !important;
+  font-weight:900 !important;
+}
+.card .hd p{
+  color: rgba(255,255,255,.75) !important;
+}
+
+/* 3) Inputs (generelt) */
+input, select, textarea{
+  background: var(--input-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  color:#fff !important;
+}
+input::placeholder, textarea::placeholder{
+  color: rgba(255,255,255,.55) !important;
+}
+input:focus, select:focus, textarea:focus{
+  outline: none !important;
+  border-color: rgba(225,29,46,.55) !important;
+  box-shadow: 0 0 0 4px rgba(225,29,46,.18) !important;
+}
+
+/* 4) Knapper (generelt) */
+.btn{
+  background: var(--btn-bg) !important;
+  border: 1px solid var(--btn-border) !important;
+  color:#fff !important;
+}
+.btn.primary{
+  background: linear-gradient(135deg, #ff2d55, #e11d2e) !important;
+  border-color: transparent !important;
+}
+
+/* 5) VIGTIGT: Preview/police “papir” skal være hvidt */
+.preview, .preview *{
+  color: inherit !important;
+}
+.preview{
+  background: #fff !important;
+  border: 1px solid rgba(0,0,0,.10) !important;
+  box-shadow: 0 18px 50px rgba(0,0,0,.35) !important;
+}
+
+/* =========================================================
+   GLOBAL DARK GLASS 
+========================================================= */
+
+/* 1) Glass-variabler */
+:root{
+  --glass-bg: rgba(0,0,0,.78);
+  --glass-border: rgba(255,255,255,.14);
+  --glass-hd: rgba(255,255,255,.06);
+  --glass-shadow: 0 24px 80px rgba(0,0,0,.55);
+
+  --glass-glow1: rgba(255,45,85,.18);
+  --glass-glow2: rgba(225,29,46,.14);
+
+  --glass-text: rgba(255,255,255,.92);
+  --glass-muted: rgba(255,255,255,.72);
+
+  --glass-input-bg: rgba(255,255,255,.06);
+  --glass-input-border: rgba(255,255,255,.16);
+}
+
+/* 2) Gør ALLE cards + welcome-box mørke */
+.card,
+.welcome-box{
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  backdrop-filter: blur(10px) !important;
+
+  color: var(--glass-text) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* ✅ Gør velkommen-boksen rund som de andre cards */
+.welcome-box{
+  border-radius: var(--radius) !important;
+}
+
+/* (valgfrit) hvis du vil have samme “luft” som cards */
+.welcome-box{
+  padding: 18px !important;
+}
+
+/* Glød-lag BAG indhold */
+.card::before,
+.welcome-box::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  background:
+    radial-gradient(700px 320px at 80% 20%, var(--glass-glow1), transparent 60%),
+    radial-gradient(600px 280px at 15% 65%, var(--glass-glow2), transparent 60%);
+  z-index: 0;
+  pointer-events:none;
+}
+
+/* Alt indhold OVER glød-laget */
+.card > *,
+.welcome-box > *{
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* 3) Card-header (.hd) skal være mørk og tydelig */
+.card .hd{
+  background: var(--glass-hd) !important;
+  border-bottom: 1px solid rgba(255,255,255,.12) !important;
+  padding: 18px 18px 14px !important;
+}
+.card .hd h2,
+.card .hd h1{
+  color: #fff !important;
+  font-weight: 900 !important;
+}
+.card .hd p{
+  color: var(--glass-muted) !important;
+}
+
+/* 4) Labels + småtekster i cards */
+.card label,
+.card .small,
+.card .hint{
+  color: var(--glass-muted) !important;
+}
+
+/* Hint-boxe inde i cards (så de ikke er lyse/grå) */
+.card .hint{
+  background: rgba(255,255,255,.06) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: 14px !important;
+}
+
+/* 5) Inputs/select/textarea i cards skal være tydelige på mørk baggrund */
+.card input,
+.card select,
+.card textarea{
+  background: var(--glass-input-bg) !important;
+  border: 1px solid var(--glass-input-border) !important;
+  color: #fff !important;
+}
+.card input::placeholder,
+.card textarea::placeholder{
+  color: rgba(255,255,255,.55) !important;
+}
+
+/* 6) Tabeller (doc-table) inde i cards: lys tekst + lysere linjer */
+.card .doc-table,
+.card .doc-table *{
+  color: rgba(255,255,255,.90) !important;
+}
+.card .doc-table th{
+  color: rgba(255,255,255,.92) !important;
+  font-weight: 800 !important;
+  border-bottom: 1px solid rgba(255,255,255,.14) !important;
+}
+.card .doc-table td{
+  border-bottom: 1px solid rgba(255,255,255,.10) !important;
+}
+.card .doc-table tr:hover td{
+  background: rgba(255,255,255,.06) !important;
+}
+
+/* 7) Pills inde i cards */
+.card .pill{
+  background: rgba(255,255,255,.08) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  color: rgba(255,255,255,.88) !important;
+}
+
+/* 8) Velkommen-tekster (welcome) */
+.welcome-title{ color:#fff !important; }
+.welcome-sub{ color: var(--glass-muted) !important; }
+
+/* ✅ Ens grid for alle rows */
+#createView #insuranceForm .row{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items:start;
+}
+
+/* Mobil */
+@media (max-width: 980px){
+  #insuranceForm .row{
+    grid-template-columns: 1fr;
+  }
+}
+#insuranceForm .field{
+  position: relative;
+  min-width: 0; /* vigtig: gør at inputs ikke flyder ud */
+}
+
+#insuranceForm .field input,
+#insuranceForm .field select,
+#insuranceForm .field textarea{
+  width: 100%;
+  box-sizing: border-box;
+}
+/* ✅ Info-knap placeres ovenpå input i stedet for at tage plads */
+
+#insuranceForm .field .info-btn{
+  position:absolute;
+  right: 10px;
+  top: 34px;
+  z-index: 2;
+}
+#docUpload{
+  width: 100%;
+}
+
+#docUploadStatus{
+  min-height: 18px; /* så layoutet ikke hopper når der kommer fejltekst */
+}
+#createView .card{
+  width: min(1250px, 100%);
+  margin: 0 auto;
+}
+
+#createView{
+  max-width: 1400px;
+  margin: 0 auto;
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo-badge">✓</div>
+    <div class="brand-name">CargoSafe</div>
+  </div>
+
+    <nav id="appNav" class="nav hidden">
+      <button id="navWelcome" class="tab active" type="button">Forside</button>
+<button id="navClaim" class="tab" type="button">Anmeld skade</button>
+      <button id="navCreate" class="tab" type="button">Opret</button>
+      <button id="navHistory" class="tab" type="button">Historik</button>
+<button id="navDrafts" class="tab" type="button">Kladder</button>
+      <button id="navAdminUsers" class="tab hidden" type="button">Brugere</button>
+<button id="navSpecial" class="tab hidden" type="button">Specielle forespørgsler</button>
+<button id="navProfile" class="tab" type="button">Ret bruger-info</button>
+
+
+    </nav>
+
+    <div style="display:flex; gap:10px; align-items:center;">
+      <div class="pill" id="userPill">Ikke logget ind</div>
+      <button class="btn danger hidden" id="logoutBtn" type="button">Log ud</button>
+    </div>
+  </div>
+
+</header>
+<main class="page">
+  </main>
+
+<!-- LOGIN VIEW -->
+<section class="center" id="loginView">
+  <div class="card login-card">
+    <div class="hd">
+      <div class="badge"><span class="dot"></span> Demo-login (frontend)</div>
+      <h2 style="margin-top:12px;">Log ind</h2>
+      <p>Indtast brugernavn og adgangskode for at oprette en forsikringsanmeldelse.</p>
+    </div>
+
+    <div class="bd">
+      <div class="row" style="gap:10px; flex-wrap:wrap;">
+        <input id="loginUsername" placeholder="Brugernavn" />
+        <input id="loginPassword" placeholder="Password" type="password" />
+      </div>
+
+      <div class="small" style="margin-top:10px;">
+        Demo-konto (til test): <b>admin</b> / <b>cargosafe123</b>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:14px;">
+        <button class="btn primary" id="loginBtn" type="button">Log ind</button>
+        <button class="btn" id="fillDemoBtn" type="button">Udfyld demo-login</button>
+      </div>
+
+      <div class="toast" id="loginToast">Forkert brugernavn eller adgangskode.</div>
+    </div>
+  </div>
+</section>
+
+<main id="appView" class="hidden">
+<!-- APP VIEW -->
+  <!-- WELCOME VIEW (vises efter login) -->
+<section id="welcomeView" class="welcome-hero">
+  <div class="welcome-box">
+    <h1 class="welcome-title">Velkommen til <span>CargoSafe</span></h1>
+<p class="welcome-sub">
+  Tegn vareforsikring på få minutter – få pris, udsted police og kom videre.
+</p>
+    <div class="welcome-body">
+      <!-- ✅ KUNDE-INDHOLD (skjules for admin) -->
+      <div id="customerWelcome">
+        <div class="hint" style="margin-bottom:12px;">
+          <b>Klar til at tegne vareforsikring?</b><br/>
+          Udfyld få felter – få tilbud – udsted police.
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn primary" id="startBtn" type="button">Start – tegn vareforsikring</button>
+          <button class="btn" id="skipWelcomeBtn" type="button">Gå direkte til formular</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="small">
+          <b>Slogan-forslag:</b><br/>
+          “CargoSafe – begynd at tegne vareforsikringer på få minutter.”
+        </div>
+      </div>
+
+     <!-- ✅ ADMIN-INDHOLD (vises kun for admin) -->
+<div id="adminWelcome" class="hidden">
+  <div class="hint" style="margin-bottom:12px;">
+    <b>Velkommen – administrer CargoSafe</b><br/>
+    Opret brugere eller håndtér specielle forespørgsler.
+  </div>
+
+  <div style="display:flex; gap:10px; flex-wrap:wrap;">
+    <button class="btn primary" id="adminGoUsersBtn" type="button">Opret bruger</button>
+    <button class="btn" id="adminGoSpecialBtn" type="button">Specielle forespørgsler</button>
+  </div>
+</div>
+</section>
+
+  <!-- ADMIN USERS VIEW -->
+ <section id="adminUsersView" class="card hidden">
+    <div class="hd">
+      <h2>Administrering af brugere</h2>
+    </div>
+    <div class="bd">
+      <div class="row">
+        <input id="newUsername" placeholder="Brugernavn" />
+        <input id="newPassword" placeholder="Password" type="password" />
+        <select id="newRole">
+          <option value="user">user</option>
+          <option value="admin">admin</option>
+        </select>
+      </div>
+<div class="row">
+  <input id="newCompanyName" placeholder="Virksomhedsnavn" />
+  <input id="newCVR" placeholder="CVR" />
+</div>
+
+<div class="row">
+  <input id="newCompanyAddress" placeholder="Adresse" />
+  <input id="newContactName" placeholder="Kontaktperson (navn)" />
+</div>
+
+<div class="row">
+  <input id="newContactPhone" placeholder="Kontakt tlf." />
+  <input id="newContactEmail" placeholder="Kontakt e-mail" />
+</div>
+<div class="row" style="margin-top:10px;">
+  <button id="createUserBtn" class="btn primary" type="button" style="width:100%;">
+    Opret bruger
+  </button>
+</div>
+
+<div class="row" style="margin-top:10px;">
+  <input id="adminUserSearch" placeholder="Søg bruger (brugernavn, virksomhed, CVR, email…)" style="flex:1;" />
+</div>
+
+<div class="small" id="adminUserSearchHint" style="margin-top:6px; opacity:.85;">
+  Viser maks 3 brugere. Søg for at finde flere.
+</div>
+      <div id="adminUsersBox" style="margin-top:10px;"></div>
+    </div>
+  </section>
+
+<section id="profileView" class="card hidden">
+  <div class="hd">
+    <h2>Ret bruger-info</h2>
+  </div>
+  <div class="bd">
+    <div class="row">
+      <input id="myCompanyName" placeholder="Virksomhedsnavn" />
+      <input id="myCVR" placeholder="CVR" />
+    </div>
+
+    <div class="row">
+      <input id="myCompanyAddress" placeholder="Adresse" style="flex:1; min-width:320px;" />
+    </div>
+
+    <div class="divider" style="margin:12px 0;"></div>
+
+    <div class="row">
+      <input id="myContactName" placeholder="Kontaktperson (navn)" />
+      <input id="myContactPhone" placeholder="Kontakt tlf." />
+      <input id="myContactEmail" placeholder="Kontakt e-mail" />
+    </div>
+
+    <div class="row" style="margin-top:10px;">
+      <button id="saveProfileBtn" class="btn primary" type="button" style="width:100%;">
+        Gem bruger-info
+      </button>
+    </div>
+
+    <div class="toast" id="profileToast">Gemt ✅</div>
+  </div>
+</section>
+
+<section id="specialView" class="hidden">
+  <div class="card">
+    <div class="hd">
+      <h2>Specielle forespørgsler</h2>
+      <p>Her kan admin sætte præmie på special pending.</p>
+    </div>
+    <div class="bd">
+      <div id="specialBox" class="hint">Indlæser...</div>
+
+      <table id="specialTable" class="doc-table" style="display:none; margin-top:12px;">
+        <thead>
+          <tr>
+            <th>Bruger</th>
+            <th>Oprettet</th>
+            <th>Info</th>
+            <th>Præmie</th>
+            <th>Handling</th>
+          </tr>
+        </thead>
+        <tbody id="specialTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+ <!-- MAIN GRID (skjules når welcome vises) -->
+<div class="grid hidden" id="mainGrid">
+  <section class="card">
+    <div class="hd">
+      <h2>Opret forsikring</h2>
+      <p>Vælg forsikringstype og udfyld felterne. “Se information” findes via ℹ-knapperne.</p>
+    </div>
+
+    <div class="bd">
+ <div class="hint hidden" id="draftBanner" style="margin-bottom:12px;">
+  <b>Kladde fundet</b> – du har en gemt kladde til denne formular.
+  <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+    <button class="btn ghost" id="draftRestoreBtn" type="button">Gendan kladde</button>
+    <button class="btn ghost" id="draftDeleteBtn" type="button">Slet kladde</button>
+  </div>
+</div>
+      <div class="tabs" role="tablist" aria-label="Forsikringstype">
+        <button class="tab active" id="tabTransport" type="button">Transportforsikring (Vareforsikring)</button>
+        <button class="tab" id="tabOphold" type="button">Opholdsforsikring</button>
+      </div>
+<div class="hint" id="templateTools" style="margin:12px 0;">
+  <b>Skabeloner</b>
+  <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+    <button class="btn" id="saveTemplateBtn" type="button">Gem som skabelon</button>
+
+    <select id="templateSelect"
+      style="min-width:260px; flex:1; padding:10px; border-radius:12px; border:1px solid var(--line);
+             background:rgba(255,255,255,.06); color:var(--text);">
+      <option value="">Indlæs skabelon…</option>
+    </select>
+
+    <button class="btn ghost" id="applyTemplateBtn" type="button">Indlæs</button>
+  </div>
+
+  <div class="small muted" style="margin-top:8px;">
+    Skabeloner gemmes pr. bruger og forsikringstype (transport/ophold).
+  </div>
+</div>
+
+ <form id="insuranceForm">
+          <!-- BASIC (both types) -->
+          <div class="row">
+            <div class="field">
+              <label for="insured">Ordregiver / forsikrede</label>
+              <input id="insured" name="insured" required placeholder="Virksomhed / navn" />
+              <button type="button" class="info-btn" data-info="insured" aria-label="Se information">ℹ</button>
+            </div>
+            <div class="field">
+              <label for="internalRef">Intern reference</label>
+              <input id="internalRef" name="internalRef" placeholder="fx sagsnr., kundenr., reference" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="address">Adresse</label>
+              <input id="address" name="address" required placeholder="Vejnavn og nr." />
+            </div>
+            <div class="field">
+              <label for="zipCity">Post nr og by</label>
+              <input id="zipCity" name="zipCity" required placeholder="fx 2100 København Ø" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="country">Land</label>
+              <select id="country" name="country" required></select>
+            </div>
+            <div class="field">
+              <label for="bl">Bill of Lading / Fragtbrevs nr.</label>
+              <input id="bl" name="bl" placeholder="B/L eller CMR/AWB/Tracking nr." />
+              <button type="button" class="info-btn" data-info="bl" aria-label="Se information">ℹ</button>
+            </div>
+          </div>
+
+<!-- ✅ INDSÆT DEN HER (lige efter B/L-rækken) -->
+<div class="row">
+  <div class="field" style="grid-column: 1 / -1;">
+    <label for="docUpload">Vedhæft CMR / B/L / Sea Waybill / Air Waybill (PDF/JPG/PNG)</label>
+    <input id="docUpload" type="file" accept=".pdf,image/*" />
+    <div class="small" id="docUploadStatus" style="margin-top:6px; opacity:.85;"></div>
+<button type="button" class="btn ghost" id="docUploadClear" style="margin-top:8px;">
+  Fjern dokument
+</button>
+  </div>
+</div>
+
+<div class="row">
+  <div class="field">
+    <label for="specialConditions">Special condition</label>
+    <input id="specialConditions" name="specialConditions" placeholder="Særlige klausuler / udvidelser" />
+    <button type="button" class="info-btn" data-info="specialConditions" aria-label="Se information">ℹ</button>
+  </div>
+
+  <div class="field">
+    <label for="goodsGroup">Varegruppe</label>
+    <select id="goodsGroup" name="goodsGroup" required>
+      <option value="" selected disabled>-- Vælg varegruppe --</option>
+      <option value="Almindelige nye handelsvarer">Almindelige nye handelsvarer</option>
+      <option value="Køle-/frysegods">Køle-/frysegods</option>
+      <option value="Elektronik (eks. højrisikovarer)">Elektronik (eks. højrisikovarer)</option>
+      <option value="Skrøbelige varer">Skrøbelige varer</option>
+      <option value="Flyttegods og personlige effekter">Flyttegods og personlige effekter</option>
+    </select>
+    <button type="button" class="info-btn" data-info="goodsGroup" aria-label="Se information">ℹ</button>
+  </div>
+</div>
+
+          <div class="row">
+            <div class="field" style="grid-column: 1 / -1;">
+              <label for="goodsDesc">Varebeskrivelse (evt. vægt, dimension og container nr.)</label>
+              <textarea id="goodsDesc" name="goodsDesc" required placeholder="Beskriv varerne, mængder, vægt, dimensioner, container nr. osv."></textarea>
+              <button type="button" class="info-btn" data-info="goodsDesc" aria-label="Se information">ℹ</button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="sumInsured">Forsikringssum (DKK)</label>
+              <input id="sumInsured" name="sumInsured" type="number" min="0" step="1" required placeholder="fx 250000" />
+              <button type="button" class="info-btn" data-info="sumInsured" aria-label="Se information">ℹ</button>
+            </div>
+            <div class="field">
+              <label for="deductible">Selvrisiko</label>
+             <select id="deductible" name="deductible" required>
+  <option value="" selected disabled>-- Vælg selvrisiko --</option>
+  <option value="0">DKK 0</option>
+  <option value="3000">DKK 3.000</option>
+  <option value="5000">DKK 5.000</option>
+  <option value="10000">DKK 10.000</option>
+  <option value="15000">DKK 15.000</option>
+  <option value="25000">DKK 25.000</option>
+  <option value="50000">DKK 50.000</option>
+</select>
+              <button type="button" class="info-btn" data-info="deductible" aria-label="Se information">ℹ</button>
+            </div>
+          </div>
+
+          <!-- TRANSPORT-ONLY -->
+          <div id="transportOnly">
+            <div class="divider"></div>
+
+            <div class="row">
+              <div class="field">
+                <label for="incoterms">Salgs/leveringsbetingelser (Incoterms 2010)</label>
+                <select id="incoterms" name="incoterms" required>
+                  <option value="" selected disabled>-- Vælg Incoterms 2010 --</option>
+                  <option value="EXW">EXW</option>
+                  <option value="FCA">FCA</option>
+                  <option value="CPT">CPT</option>
+                  <option value="CIP">CIP</option>
+                  <option value="DAT">DAT</option>
+                  <option value="DAP">DAP</option>
+                  <option value="DDP">DDP</option>
+                  <option value="FAS">FAS (kun søtransport)</option>
+                  <option value="FOB">FOB (kun søtransport)</option>
+                  <option value="CFR">CFR (kun søtransport)</option>
+                  <option value="CIF">CIF (kun søtransport)</option>
+                </select>
+                <button type="button" class="info-btn" data-info="incoterms" aria-label="Se information">ℹ</button>
+              </div>
+
+              <div class="field">
+                <label for="departureDate">Afgangsdato</label>
+                <input id="departureDate" name="departureDate" type="date" required />
+                <button type="button" class="info-btn" data-info="departureDate" aria-label="Se information">ℹ</button>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label for="fromCountry">Fra (land)</label>
+                <select id="fromCountry" name="fromCountry" required></select>
+                <button type="button" class="info-btn" data-info="fromTo" aria-label="Se information">ℹ</button>
+              </div>
+              <div class="field">
+                <label for="fromCity">By</label>
+                <input id="fromCity" name="fromCity" required placeholder="Afgang by" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label for="viaCountry">Via (land)</label>
+                <select id="viaCountry" name="viaCountry">
+                  <option value="" selected>-- Vælg land --</option>
+                </select>
+                <button type="button" class="info-btn" data-info="via" aria-label="Se information">ℹ</button>
+              </div>
+              <div class="field">
+                <label for="viaCity">By</label>
+                <input id="viaCity" name="viaCity" placeholder="Transit by (valgfri)" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label for="toCountry">Til (land)</label>
+                <select id="toCountry" name="toCountry" required></select>
+                <button type="button" class="info-btn" data-info="fromTo" aria-label="Se information">ℹ</button>
+              </div>
+              <div class="field">
+                <label for="toCity">By</label>
+                <input id="toCity" name="toCity" required placeholder="Destination by" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field" style="grid-column: 1 / -1;">
+                <label>Transportform</label>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                  <label class="pill"><input type="radio" name="transportMode" value="Bane" required /> Bane</label>
+                  <label class="pill"><input type="radio" name="transportMode" value="Bil" /> Bil</label>
+                  <label class="pill"><input type="radio" name="transportMode" value="Fly" /> Fly</label>
+                  <label class="pill"><input type="radio" name="transportMode" value="Post" /> Post</label>
+                  <label class="pill"><input type="radio" name="transportMode" value="Skib" /> Skib</label>
+                  <label class="pill"><input type="radio" name="transportMode" value="Andet" /> Andet</label>
+                </div>
+                <button type="button" class="info-btn" data-info="transportMode" aria-label="Se information">ℹ</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button id="getQuoteBtn" type="button" class="btn primary">Få tilbud</button>
+            <button class="btn" type="button" id="resetBtn">Nulstil</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <aside class="card">
+      <div class="hd">
+        <h2>Oversigt</h2>
+        <p>Her kan du se en live-status og en forhåndsvisning af de indtastede data.</p>
+      </div>
+      <div class="bd">
+        <div class="kpis">
+          <div class="kpi">
+            <div class="t">Forsikringstype</div>
+            <div class="v" id="kpiType">Transportforsikring</div>
+          </div>
+          <div class="kpi">
+            <div class="t">Udfyldte felter</div>
+            <div class="v" id="kpiFilled">0</div>
+          </div>
+        </div>
+        <div class="divider"></div>
+
+        <div class="hint">
+          Tip: Hvis du vælger <b>Køle-/frysegods</b> og ønsker udvidet dækning, så skriv
+          <b>“Udvidet dækning for køle-/frysetransporter”</b> i “Special condition”.
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="small">Forhåndsvisning:</div>
+
+<div id="docPreview" class="doc-preview" aria-live="polite"></div>
+
+<div style="margin-top:10px;">
+  <details>
+  <summary class="small">Vis teknisk JSON</summary>
+  <pre id="preview">{}</pre>
+</details>
+</div>
+<div class="divider"></div>
+
+<div class="small"><b>Tilbud / Status</b></div>
+<div class="hint" id="quoteBox" style="margin-top:10px;">
+  Ingen tilbud endnu. Klik <b>“Få tilbud”</b> når alle felter er udfyldt.
+</div>
+
+<div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+  <button class="btn primary hidden" id="acceptQuoteBtn" type="button">Godkend tilbud</button>
+  <button class="btn hidden" id="issuePolicyBtn" type="button">Udsted police</button>
+  <button class="btn hidden" id="printPolicyBtn" type="button">Print police</button>
+</div>
+
+<div class="divider hidden" id="adminDivider"></div>
+<div class="small hidden" id="adminTitle"><b>Admin – Specielle forespørgsler</b></div>
+<div class="hint hidden" id="adminBox" style="margin-top:10px;">
+  Ingen specielle forespørgsler.
+</div>
+
+<!-- ADMIN: User management -->
+  <div class="toast" id="adminUserToast" style="display:none;"></div>
+</div>
+
+<div class="divider hidden" id="adminUserDetailsDivider"></div>
+<div class="hint hidden" id="adminUserDetailsBox" style="margin-top:10px;">
+  Vælg en bruger for at se quotes/policer.
+</div>
+</div>   
+</aside>
+
+</div>   
+
+<!-- CLAIM VIEW (Anmeld skade) -->
+<section class="card hidden" id="claimView" style="margin-top:16px;">
+  <div class="hd">
+    <h2>Anmeld skade</h2>
+    <p>Ifyld dine oplysninger, og så vender vi tilbage hurtigst muligt.</p>
+  </div>
+
+  <div class="bd">
+    <form id="claimForm">
+      <div class="row">
+        <div class="field">
+          <label for="claimPolicyholder">Forsikringstager *</label>
+          <input id="claimPolicyholder" required placeholder="Forsikringstager" />
+        </div>
+        <div class="field">
+          <label for="claimName">Dit navn *</label>
+          <input id="claimName" required placeholder="Dit navn" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="claimCvr">CVR-/CPR-nr. *</label>
+          <input id="claimCvr" required placeholder="CVR-nummer eller CPR-nummer" />
+        </div>
+        <div class="field">
+          <label for="claimPolicyNo">Forsikringsaftalenr./policenr. *</label>
+          <input id="claimPolicyNo" required placeholder="Forsikringsaftalenr./policenr." />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="claimEmail">Mailadresse *</label>
+          <input id="claimEmail" type="email" required placeholder="Mailadresse" />
+        </div>
+        <div class="field">
+          <label for="claimPhone">Telefonnummer *</label>
+          <input id="claimPhone" required placeholder="+45XXXXXXXX" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="claimDate">Hvornår skete skaden? *</label>
+          <input id="claimDate" type="date" required />
+        </div>
+        <div class="field">
+          <label for="claimFiles">Vedhæft dokumentation</label>
+          <input id="claimFiles" type="file" multiple accept=".pdf,image/*" />
+          <div class="small" id="claimFilesHint" style="margin-top:6px; opacity:.85;"></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field" style="grid-column: 1 / -1;">
+          <label for="claimDesc">Skriv hvad der er sket *</label>
+          <textarea id="claimDesc" required placeholder="Hvad er der sket?"></textarea>
+        </div>
+      </div>
+
+      <div class="small" style="opacity:.8; margin-top:6px;">* Obligatorisk felt</div>
+
+      <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
+        <button class="btn primary" id="claimSendBtn" type="submit">Send</button>
+        <button class="btn ghost" id="claimResetBtn" type="button">Nulstil</button>
+      </div>
+
+      <div class="toast" id="claimToast" style="display:none; margin-top:12px;"></div>
+    </form>
+  </div>
+</section>
+ 
+<!-- HISTORY VIEW (egen side) -->
+<section class="card hidden" id="historyView" style="margin-top:16px;">
+  <div class="hd">
+    <h2>Mine vareforsikringer</h2>
+    <p>Her kan du se dine tidligere tilbud og udstedte policer.</p>
+  </div>
+
+  <!-- ✅ ADMIN filter (kun i historyView) -->
+  <div id="adminPolicyFilter" class="row hidden" style="gap:8px; margin:10px 0;">
+    <label>Fra: <input type="date" id="polFrom"></label>
+    <label>Til: <input type="date" id="polTo"></label>
+    <button class="btn" id="polApply" type="button">Vis</button>
+    <button class="btn ghost" id="polClear" type="button">Nulstil</button>
+  </div>
+
+  <div class="bd">
+    <div class="hint" id="historyBox">Indlæser...</div>
+
+    <div class="divider"></div>
+
+    <div style="overflow:auto;">
+      <table class="doc-table" id="historyTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Police nr.</th>
+            <th>Præmie</th>
+            <th>Oprettet/Udstedt</th>
+          </tr>
+        </thead>
+        <tbody id="historyTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+<section class="card hidden" id="draftsView" style="margin-top:16px;">
+  <div class="hd">
+    <h2>Kladder</h2>
+    <p>Her ligger automatisk gemte kladder fra ufuldendte formularer.</p>
+  </div>
+  <div class="bd">
+    <div class="hint" id="draftsBox">Ingen kladder endnu.</div>
+    <div id="draftsList" style="display:grid; gap:12px; margin-top:12px;"></div>
+<hr style="border:none; border-top:1px solid var(--line); margin:18px 0;">
+<div class="small"><b>Skabeloner</b></div>
+<div class="hint" id="templatesBox" style="margin-top:10px;">Ingen skabeloner endnu.</div>
+<div id="templatesList" style="display:grid; gap:12px; margin-top:12px;"></div>
+  </div>
+</section>
+</main>
+
+<!-- INFO MODAL -->
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal">
+    <div class="mhd">
+      <h3 id="modalTitle">Information</h3>
+      <button class="close-x" id="modalClose">Luk</button>
+    </div>
+    <div class="mbd" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ✅ INDSÆT HER (før din egen JS) -->
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
+<script>
+  // pdf.js worker (skal matche versionen)
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.worker.min.js";
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<script>
+const DEMO_USER = "admin";
+const DEMO_PASS = "cargosafe123";
+const API_BASE = "http://localhost:3001";
+  /*************************
+   * 3) Login logic (demo)
+   *************************/
+  const loginView = document.getElementById("loginView");
+  const appView = document.getElementById("appView");
+  const userPill = document.getElementById("userPill");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const loginToast = document.getElementById("loginToast");
+
+const navSpecial = document.getElementById("navSpecial");
+
+const specialView  = document.getElementById("specialView");
+const specialBox   = document.getElementById("specialBox");
+const specialTable = document.getElementById("specialTable");
+const specialTbody = document.getElementById("specialTbody");
+
+const navClaim = document.getElementById("navClaim");
+const claimView = document.getElementById("claimView");
+const claimForm = document.getElementById("claimForm");
+const claimToast = document.getElementById("claimToast");
+const claimResetBtn = document.getElementById("claimResetBtn");
+const claimFiles = document.getElementById("claimFiles");
+const claimFilesHint = document.getElementById("claimFilesHint");
+
+// Views
+const historyView = document.getElementById("historyView");
+const historyBox = document.getElementById("historyBox");
+const historyTable = document.getElementById("historyTable");
+const historyTbody = document.getElementById("historyTbody");
+const draftsView = document.getElementById("draftsView");
+
+const draftBanner = document.getElementById("draftBanner");
+const draftRestoreBtn = document.getElementById("draftRestoreBtn");
+const draftDeleteBtn  = document.getElementById("draftDeleteBtn");
+
+const draftsBox  = document.getElementById("draftsBox");
+const draftsList = document.getElementById("draftsList");
+
+const templateTools   = document.getElementById("templateTools");
+const saveTemplateBtn = document.getElementById("saveTemplateBtn");
+const templateSelect  = document.getElementById("templateSelect");
+const applyTemplateBtn = document.getElementById("applyTemplateBtn");
+
+const templatesBox  = document.getElementById("templatesBox");
+const templatesList = document.getElementById("templatesList");
+
+// Nav
+const appNav = document.getElementById("appNav");
+const navWelcome = document.getElementById("navWelcome");
+const navCreate  = document.getElementById("navCreate");
+const navHistory = document.getElementById("navHistory");
+const navDrafts = document.getElementById("navDrafts");
+const navAdminUsers = document.getElementById("navAdminUsers");
+const navProfile = document.getElementById("navProfile");
+const profileView = document.getElementById("profileView");
+
+const myCompanyName = document.getElementById("myCompanyName");
+const myCVR = document.getElementById("myCVR");
+const myCompanyAddress = document.getElementById("myCompanyAddress");
+const myContactName = document.getElementById("myContactName");
+const myContactPhone = document.getElementById("myContactPhone");
+const myContactEmail = document.getElementById("myContactEmail");
+const saveProfileBtn = document.getElementById("saveProfileBtn");
+const profileToast = document.getElementById("profileToast");
+
+// Welcome view refs
+const welcomeView = document.getElementById("welcomeView");
+const mainGrid = document.getElementById("mainGrid");
+const startBtn = document.getElementById("startBtn");
+const skipWelcomeBtn = document.getElementById("skipWelcomeBtn");
+function getToken(){
+  return localStorage.getItem("cs_token") || "";
+}
+const adminGoUsersBtn = document.getElementById("adminGoUsersBtn");
+const adminGoSpecialBtn = document.getElementById("adminGoSpecialBtn");
+
+adminGoUsersBtn?.addEventListener("click", () => {
+  showView("adminUsers");
+  if (typeof renderAdminUsers === "function") renderAdminUsers();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+adminGoSpecialBtn?.addEventListener("click", async () => {
+  showView("special");
+  if (typeof renderSpecialRequests === "function") await renderSpecialRequests();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+navProfile?.addEventListener("click", async () => {
+  showView("profile");
+  await renderMyProfile();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+async function renderMyProfile(){
+  const out = await api("/api/me", { method: "GET" });
+  const u = out?.user || {};
+
+  if(myCompanyName) myCompanyName.value = u.companyName || "";
+  if(myCVR) myCVR.value = u.cvr || "";
+  if(myCompanyAddress) myCompanyAddress.value = u.companyAddress || "";
+  if(myContactName) myContactName.value = u.contactName || "";
+  if(myContactPhone) myContactPhone.value = u.contactPhone || "";
+  if(myContactEmail) myContactEmail.value = u.contactEmail || "";
+}
+
+function showProfileToast(msg, isError=false){
+  if(!profileToast) return;
+  profileToast.textContent = msg;
+  profileToast.style.display = "block";
+  profileToast.style.background = isError ? "rgba(255,0,0,.18)" : "rgba(0,0,0,.35)";
+  clearTimeout(showProfileToast._t);
+  showProfileToast._t = setTimeout(() => (profileToast.style.display="none"), 2200);
+}
+
+saveProfileBtn?.addEventListener("click", async () => {
+  try{
+    await api("/api/me", {
+      method: "PUT",
+      body: {
+        companyName: (myCompanyName?.value || "").trim(),
+        cvr: (myCVR?.value || "").trim(),
+        companyAddress: (myCompanyAddress?.value || "").trim(),
+        contactName: (myContactName?.value || "").trim(),
+        contactPhone: (myContactPhone?.value || "").trim(),
+        contactEmail: (myContactEmail?.value || "").trim()
+      }
+    });
+
+    showProfileToast("Gemt ✅");
+  } catch(err){
+    showProfileToast("Kunne ikke gemme: " + (err?.message || err), true);
+  }
+});
+async function api(path, opts = {}) {
+  const {
+    method = "GET",
+    body,
+    auth = true,
+    extraHeaders = {}
+  } = opts;
+
+  const headers = { "Content-Type": "application/json", ...extraHeaders };
+
+  if (auth) {
+    const t = getToken();
+    if (t) headers.Authorization = `Bearer ${t}`;
+  }
+
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  if (res.status === 401) {
+    localStorage.removeItem("cs_token");
+    localStorage.removeItem("cs_user");
+    if (typeof setLoggedOut === "function") setLoggedOut();
+    throw new Error("Session udløbet – log ind igen.");
+  }
+
+  const text = await res.text();
+  let data;
+  try { data = text ? JSON.parse(text) : {}; }
+  catch { data = { raw: text }; }
+
+  if (!res.ok) {
+    throw new Error(data?.error || data?.message || data?.raw || `HTTP ${res.status}`);
+  }
+
+  return data;
+}
+  /***********************
+   * 1) Data: Countries
+   ***********************/
+  const countries = [
+    "Afghanistan","Albanien","Algeriet","Andorra","Angola","Antigua og Barbuda","Argentina","Armenien","Aserbajdsjan",
+    "Australien","Bahamas","Bahrain","Bangladesh","Barbados","Belgien","Belize","Benin","Bhutan","Bolivia",
+    "Bosnien-Hercegovina","Botswana","Brasilien","Brunei","Bulgarien","Burkina Faso","Burundi","Cambodja","Cameroun",
+    "Canada","Chad","Chile","Colombia","Comorerne","Congo","Cookøerne","Costa Rica","Cuba","Cypern","Danmark",
+    "Den Centralafrikanske Republik","Den Demokratiske Republik Congo","Djibouti","Dominica","Dominikanske Republik",
+    "Ecuador","Egypten","El Salvador","Elfenbenskysten","Eritrea","Estland","eSwatini","Etiopien","Fiji","Filippinerne",
+    "Finland","Forenede Arabiske Emirater","Frankrig","Færøerne","Gabon","Gambia","Georgien","Ghana","Grenada",
+    "Grækenland","Grønland","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Holland","Honduras","Hviderusland (Belarus)",
+    "Indien","Indonesien","Irak","Iran","Irland","Island","Israel","Italien","Jamaica","Japan","Jordan","Kap Verde",
+    "Kasakhstan","Kenya","Kina","Kirgisistan","Kiribati","Kosovo","Kroatien","Kuwait","Laos","Lesotho","Letland",
+    "Libanon","Liberia","Libyen","Liechtenstein","Litauen","Luxembourg","Madagaskar","Malawi","Malaysia","Maldiverne",
+    "Mali","Malta","Marokko","Marshalløerne","Mauritanien","Mauritius","Mexico","Mikronesien","Moldova","Monaco",
+    "Mongoliet","Montenegro","Mozambique","Myanmar (Burma)","Namibia","Nauru","Nepal","New Zealand","Nicaragua",
+    "Niger","Nigeria","Niue","Nordkorea","Nordmakedonien","Norge","Oman","Pakistan","Palau","Palæstina","Panama",
+    "Papua Ny Guinea","Paraguay","Peru","Polen","Portugal","Qatar","Rumænien","Rusland","Rwanda","Saint Kitts og Nevis",
+    "Saint Lucia","Saint Vincent og Grenadinerne","Salomonøerne","Samoa","San Marino","São Tomé og Príncipe","Saudi-Arabien",
+    "Schweiz","Senegal","Serbien","Seychellerne","Sierra Leone","Singapore","Slovakiet","Slovenien","Somalia","Spanien",
+    "Sri Lanka","Storbritannien","Sudan","Surinam","Sverige","Sydafrika","Sydkorea","Sydsudan","Syrien","Tadsjikistan",
+    "Taiwan","Tanzania","Thailand","Tjekkiet","Togo","Tonga","Trinidad og Tobago","Tunesien","Turkmenistan","Tuvalu",
+    "Tyrkiet","Tyskland","Uganda","Ukraine","Ungarn","Uruguay","USA","Usbekistan","Vanuatu","Vatikanstaten","Venezuela",
+    "Vestsahara","Vietnam","Yemen","Zambia","Zimbabwe","Ækvatorialguinea","Østrig","Østtimor"
+  ];
+
+function esc(v){
+  const s = String(v ?? "");
+  return s
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+/*************************
+ * 2) Modal content (info)
+ *************************/
+const infoContent = {
+  insured: {
+    title: "Ordregiver / forsikrede",
+    body: `
+      <p>Angiv den virksomhed/person, som står som ordregiver og/eller forsikrede på policen.</p>
+      <ul>
+        <li>Brug gerne CVR/firmabetegnelse internt (hvis relevant).</li>
+        <li>Hvis ordregiver ≠ forsikrede, kan du skrive begge, fx “Ordregiver: X / Forsikrede: Y”.</li>
+      </ul>
+    `
+  },
+
+  bl: {
+    title: "Bill of Lading / Fragtbrevs nr.",
+    body: `
+      <p>Angiv relevant transportdokument, fx:</p>
+      <ul>
+        <li>B/L (søfragt), CMR (vej), AWB (fly), rail waybill (bane), tracking reference osv.</li>
+        <li>Hvis der er flere numre, kan de angives i samme felt.</li>
+      </ul>
+    `
+  },
+
+  specialConditions: {
+    title: "Special condition",
+    body: `
+      <p>Her angives særlige klausuler/udvidelser, som kan kræve manuel vurdering.</p>
+      <p><b>Køle-/frysegods:</b> Hvis du ønsker udvidet dækning, skriv:</p>
+      <p><b>“Udvidet dækning for køle-/frysetransporter”</b><br/>
+      (engelsk: “Incl. Frozen Food Extension Clauses”)</p>
+      <p>Dette kan udløse en “Speciel Forespørgsel” til forsikringsselskabet.</p>
+    `
+  },
+
+  goodsGroup: {
+    title: "Varegruppe",
+    body: `
+      <h4>Almindelige nye handelsvarer</h4>
+      <p>(Maskiner, reservedele, værktøj, manufaktur, konfektion, metervarer, lædervarer, plastic- og gummivarer, kolonialvarer, konserves, øl og vand, vin, mejeriprodukter, adskilte møbler)</p>
+
+      <h4>Køle-/frysegods</h4>
+      <p>(Enhver varetype som transporteres temperaturreguleret, herunder også forsendelser der “varmereguleres”.)</p>
+      <p><b>Bemærk:</b> Standardbetingelserne “Danske køle-/frysebetingelser” giver begrænset dækning. Temperaturskade dækkes kun hvis kølemaskineriet bryder sammen og stopper i <b>24 sammenhængende timer</b>.</p>
+      <p>Fx dækkes følgende mulige skadeårsager <b>IKKE</b>: fejlindstilling af temperatur, fejlfunktion i anlægget, manglende strøm- eller diesel.</p>
+      <p>Udvidet dækning kan typisk kræve præmieforhøjelse (ofte ca. dobbelt), og noteres i “Special condition” som:
+      <b>“Udvidet dækning for køle-/frysetransporter”</b> / “Incl. Frozen Food Extension Clauses”.</p>
+
+      <h4>Elektronik (eks. højrisikovarer)</h4>
+      <p>(Elektronik (printplader, chips), radioer, TV, video, DVD, højttalere, musikinstrumenter, fotoudstyr, hårde hvidevarer, samlede møbler, kontorinventar.)</p>
+      <p><b>Højrisikovarer</b> der typisk <b>IKKE</b> kan forsikres herunder: mobiltelefoner, MP3-afspillere, iPods o.lign.</p>
+
+      <h4>Skrøbelige varer</h4>
+      <p>(Glas, porcelæn, keramik, herunder også keramiske fliser og plader af marmor, granit eller lign.)</p>
+
+      <h4>Flyttegods og personlige effekter</h4>
+      <p>(Flyttegods, private effekter mv.)</p>
+    `
+  },
+
+  goodsDesc: {
+    title: "Varebeskrivelse",
+    body: `
+      <p>Beskriv godset så præcist som muligt. Inkludér gerne:</p>
+      <ul>
+        <li>Mængde (antal kolli/paller)</li>
+        <li>Vægt (brutto/netto)</li>
+        <li>Dimensioner</li>
+        <li>Container nr. / seal nr. (hvis relevant)</li>
+        <li>Særlige håndteringskrav (fx “keep upright”, “fragile”, temperatur)</li>
+      </ul>
+    `
+  },
+
+  sumInsured: {
+    title: "Forsikringssum",
+    body: `
+      <p>Forsikringssummen er den værdi, der ønskes forsikret (typisk vareværdi + evt. fragt/omkostninger afhængigt af set-up).</p>
+      <p>Angiv beløbet i <b>DKK</b> (tal uden punktum/komma, fx 250000).</p>
+    `
+  },
+
+  deductible: {
+    title: "Selvrisiko",
+    body: `
+      <p>Selvrisiko er den del af en skade, som forsikringstager selv betaler, før forsikringen dækker.</p>
+      <p>Vælg en af standard-selvrisikoerne i listen.</p>
+    `
+  },
+
+  incoterms: {
+    title: "Incoterms 2010 (Salgs/leveringsbetingelser)",
+    body: `
+      <p>Vælg den relevante Incoterms 2010-klausul. Her er dine beskrivelser:</p>
+
+      <h4>EXW – Ex Works [navngivent sted]</h4>
+      <p>Levering og risikoovergang sker, når sælger stiller godset til rådighed for køber på sælgers forretningssted eller anden angivet plads uden at godset er læsset.</p>
+
+      <h4>FCA – Free Carrier [navngivent sted]</h4>
+      <p>Hvis stedet er sælgers forretningssted: risikoovergang når godset er lastet på købers transportørs transportmiddel. Hvis uden for sælgers plads: når godset stilles til rådighed for transportøren fra sælgers transportmiddel.</p>
+
+      <h4>CPT – Carriage Paid To [navngivent sted]</h4>
+      <p>Levering og risikoovergang sker, når godset er overgivet til den første transportør.</p>
+
+      <h4>CIP – Carriage and Insurance Paid to [navngivent sted]</h4>
+      <p>Som CPT. Sælger tegner transportforsikring til dækning af købers risiko fra risikoovergangssted til bestemmelsessted (min. Institute Cargo Clauses C eller tilsvarende).</p>
+
+      <h4>DAT – Delivered At Terminal [navngivent sted]</h4>
+      <p>Risikoovergang når sælger stiller godset til rådighed for køber, aflæsset i terminal/havn/andet bestemmelsessted.</p>
+
+      <h4>DAP – Delivered At Place [navngivent sted]</h4>
+      <p>Risikoovergang når sælger stiller godset til rådighed for køber på ankommende transportmiddel på bestemmelsesstedet.</p>
+
+      <h4>DDP – Delivered Duty Paid [navngivent sted]</h4>
+      <p>Risikoovergang når godset er stillet til købers disposition, fortoldet, på bestemmelsesstedet.</p>
+
+      <hr/>
+
+      <h3>Kun søtransport</h3>
+
+      <h4>FAS – Free Alongside Ship [afskibningshavn]</h4>
+      <p>Kun sø. Risikoovergang når godset er placeret langs skibssiden i afskibningshavnen.</p>
+
+      <h4>FOB – Free On Board [afskibningshavn]</h4>
+      <p>Kun sø. Risikoovergang når varen er kommet ombord på købers skib i afskibningshavnen.</p>
+
+      <h4>CFR – Cost and Freight [destinationshavn]</h4>
+      <p>Kun sø. Risikoovergang når varen er kommet ombord på skibet i afskibningshavnen.</p>
+
+      <h4>CIF – Cost Insurance and Freight [destinationshavn]</h4>
+      <p>Kun sø. Risikoovergang når varen er kommet ombord i afskibningshavnen. Sælger tegner forsikring til dækning af købers risiko til udlosning i bestemmelseshavn (min. Institute Cargo Clauses C eller tilsvarende).</p>
+    `
+  },
+
+  departureDate: {
+    title: "Afgangsdato",
+    body: `
+      <p>Angiv afgangsdato for transporten. Brug dato-formatet fra dato-vælgeren.</p>
+      <p>Hvis opholdsforsikring er valgt, skjules dette felt.</p>
+    `
+  },
+
+  fromTo: {
+    title: "Fra / Til",
+    body: `
+      <p>Angiv oprindelse og destination (land + by). Dette bruges til at forstå ruten og risikoeksponering.</p>
+    `
+  },
+
+  via: {
+    title: "Via",
+    body: `
+      <p>“Via” er transitpunkt (land + by). Det er valgfrit, men nyttigt hvis ruten er kendt.</p>
+    `
+  },
+
+  transportMode: {
+    title: "Transportform",
+    body: `
+      <p>Vælg den primære transportform:</p>
+      <ul>
+        <li>Bane, Bil, Fly, Post, Skib eller Andet.</li>
+      </ul>
+    `
+  }
+};
+
+  function fillCountrySelect(selectEl, includePlaceholder=true){
+    selectEl.innerHTML = "";
+    if(includePlaceholder){
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "-- Vælg land --";
+      opt.disabled = true;
+      opt.selected = true;
+      selectEl.appendChild(opt);
+    }
+    countries.forEach(c => {
+      const o = document.createElement("option");
+      o.value = c;
+      o.textContent = c;
+      selectEl.appendChild(o);
+    });
+  }
+  function openModal(key){
+    const data = infoContent[key];
+    if(!data) return;
+    document.getElementById("modalTitle").textContent = data.title;
+    document.getElementById("modalBody").innerHTML = data.body;
+    const bd = document.getElementById("modalBackdrop");
+    bd.style.display = "flex";
+    bd.setAttribute("aria-hidden", "false");
+  }
+  function closeModal(){
+    const bd = document.getElementById("modalBackdrop");
+    bd.style.display = "none";
+    bd.setAttribute("aria-hidden", "true");
+  }
+const LIMIT_SUM = 2500000;
+
+// Lande der altid udløser speciel forespørgsel (match dine dropdown-tekster)
+const SPECIAL_COUNTRIES = new Set([
+  "Afghanistan","Aserbajdsjan","Burundi","Cuba","Den Demokratiske Republik Congo",
+  "Egypten","Eritrea","Guinea","Haiti","Iran","Irak","Libanon","Mali","Myanmar (Burma)",
+  "Nicaragua","Nordkorea","Qatar","Rusland","Somalia","Sydsudan","Sudan","Syrien",
+  "Tunesien","Ukraine","Yemen","Zimbabwe",
+  "Hviderusland (Belarus)" // Belarus i din liste
+]);
+
+// Selvrisiko-index (som i dit billede)
+const DEDUCTIBLE_INDEX = new Map([
+  [0,     100],
+  [3000,   96],
+  [5000,   90],
+  [10000,  83],
+  [25000,  70],
+  [50000,  60],
+  // Hvis du bruger 15.000 i dropdown, så tilføj den her når du har tallet:
+  // [15000,  ??],
+]);
+
+function deductibleFactor(obj){
+  const d = Number(obj.deductible ?? NaN);
+  if(Number.isNaN(d)) return { index: 100, factor: 1 };
+
+  const index = DEDUCTIBLE_INDEX.has(d) ? DEDUCTIBLE_INDEX.get(d) : 100;
+  return { index, factor: index / 100 };
+}
+
+// “Krim og Sevastopol” findes ikke som land i listen – så vi fanger via tekst
+const SPECIAL_TEXT_TRIGGERS = [
+  "krim", "sevastopol", "crimea",
+  "militær", "military",
+  "våben", "weapon", "ammunition", "ammo",
+  "dual-use", "dual use", "dualuse",
+  "eksplosiv", "explosive", "spræng"
+];
+
+// Rater fra din Excel (Transport) – procent/decimal af forsikringssum
+// surface = skib/bil/bane, air = fly
+const TRANSPORT_RATES = {
+  "Mellem danske pladser": {
+    surface: {"Alm. handelsv.":0.000525,"Elektronik":0.000735,"Skrøbelige varer":0.002625,"Flyttegods":0.003938},
+    air:     {"Alm. handelsv.":0.0003675,"Elektronik":0.0005145,"Skrøbelige varer":0.0018375,"Flyttegods":0.0027566}
+  },
+  "Det nordvestlige Europa": {
+    surface: {"Alm. handelsv.":0.0009,"Elektronik":0.00124,"Skrøbelige varer":0.00435,"Flyttegods":0.00675},
+    air:     {"Alm. handelsv.":0.00064,"Elektronik":0.00088,"Skrøbelige varer":0.00296,"Flyttegods":0.0046}
+  },
+  "Det sydvestlige Europa, Polen og Tjekkiet ": {
+    surface: {"Alm. handelsv.":0.00135,"Elektronik":0.00186,"Skrøbelige varer":0.0064,"Flyttegods":0.0101},
+    air:     {"Alm. handelsv.":0.00097,"Elektronik":0.00133,"Skrøbelige varer":0.0045,"Flyttegods":0.0076}
+  },
+  "Øvrige Europa inkl. Baltikum og Ukraine": {
+    surface: {"Alm. handelsv.":0.00172,"Elektronik":0.00237,"Skrøbelige varer":0.00822,"Flyttegods":0.0131},
+    air:     {"Alm. handelsv.":0.00123,"Elektronik":0.00169,"Skrøbelige varer":0.00578,"Flyttegods":0.0092}
+  },
+  "USA og Canada": {
+    surface: {"Alm. handelsv.":0.0021,"Elektronik":0.0029,"Skrøbelige varer":0.0101,"Flyttegods":0.0162},
+    air:     {"Alm. handelsv.":0.0015,"Elektronik":0.00206,"Skrøbelige varer":0.0071,"Flyttegods":0.01235}
+  },
+  "Nordatlanten, Rusland, Hviderusland, Tyrkiet, Australien, New Zealand, Japan, Hong Kong og Taiwan  ": {
+    surface: {"Alm. handelsv.":0.0031,"Elektronik":0.0043,"Skrøbelige varer":0.0152,"Flyttegods":0.0244},
+    air:     {"Alm. handelsv.":0.0022,"Elektronik":0.00304,"Skrøbelige varer":0.0106,"Flyttegods":0.0176}
+  },
+  "Øvrige mellem og fjernøsten": {
+    surface: {"Alm. handelsv.":0.0041,"Elektronik":0.0057,"Skrøbelige varer":0.0201,"Flyttegods":0.0321},
+    air:     {"Alm. handelsv.":0.0029,"Elektronik":0.00402,"Skrøbelige varer":0.0141,"Flyttegods":0.0225}
+  },
+  "Øvrige verden": {
+    surface: {"Alm. handelsv.":0.0051,"Elektronik":0.0071,"Skrøbelige varer":0.0251,"Flyttegods":0.0401},
+    air:     {"Alm. handelsv.":0.0036,"Elektronik":0.005,"Skrøbelige varer":0.0176,"Flyttegods":0.02635}
+  },
+  "Mellem Europæiske pladser": {
+    surface: {"Alm. handelsv.":0.00135,"Elektronik":0.00185,"Skrøbelige varer":0.00635,"Flyttegods":0.0101},
+    air:     {"Alm. handelsv.":0.00097,"Elektronik":0.00132,"Skrøbelige varer":0.00447,"Flyttegods":0.0071}
+  },
+  "Mellem Europa og øvrige verden": {
+    surface: {"Alm. handelsv.":0.0041,"Elektronik":0.0057,"Skrøbelige varer":0.0201,"Flyttegods":0.0301},
+    air:     {"Alm. handelsv.":0.00029,"Elektronik":0.004,"Skrøbelige varer":0.0141,"Flyttegods":0.0211}
+  }
+};
+
+// Enkel region-logik (kan udvides senere)
+const EUROPE = new Set([
+  "Danmark","Norge","Sverige","Finland","Island","Færøerne","Grønland",
+  "Storbritannien","Irland","Tyskland","Holland","Belgien","Luxembourg","Frankrig",
+  "Schweiz","Østrig","Spanien","Portugal","Italien","Grækenland","Polen","Tjekkiet",
+  "Slovakiet","Slovenien","Ungarn","Rumænien","Bulgarien","Kroatien","Serbien",
+  "Bosnien-Hercegovina","Montenegro","Albanien","Nordmakedonien","Kosovo",
+  "Estland","Letland","Litauen","Cypern","Malta","Andorra","Liechtenstein","Monaco",
+  "Ukraine" // OBS: ligger også på special listen, så den ender speciel alligevel
+]);
+
+const NW_EUROPE = new Set([
+  "Norge","Sverige","Finland","Island","Storbritannien","Irland",
+  "Tyskland","Holland","Belgien","Luxembourg","Frankrig","Schweiz","Østrig"
+]);
+
+const SW_EUROPE_PL_CZ = new Set([
+  "Spanien","Portugal","Italien","Grækenland","Polen","Tjekkiet"
+]);
+
+const BALTICS_AND_OTHER_EU = new Set([
+  "Estland","Letland","Litauen","Rumænien","Bulgarien","Ungarn","Slovakiet","Slovenien",
+  "Kroatien","Serbien","Bosnien-Hercegovina","Montenegro","Albanien","Nordmakedonien",
+  "Kosovo","Cypern","Malta"
+]);
+
+function mapGoodsGroupToRateKey(goodsGroup){
+  if(goodsGroup === "Almindelige nye handelsvarer") return "Alm. handelsv.";
+  if(goodsGroup.startsWith("Elektronik")) return "Elektronik";
+  if(goodsGroup === "Skrøbelige varer") return "Skrøbelige varer";
+  if(goodsGroup.startsWith("Flyttegods")) return "Flyttegods";
+  if(goodsGroup === "Køle-/frysegods") return "Alm. handelsv."; // basis-rate (udvidet dækning => special)
+  return "Alm. handelsv.";
+}
+
+function isFly(obj){ return (obj.transportMode || "").toLowerCase() === "fly"; }
+
+function countryTriggersSpecial(c){
+  if(!c) return false;
+  if(SPECIAL_COUNTRIES.has(c)) return true;
+  return false;
+}
+
+function textTriggersSpecial(obj){
+  const hay = ((obj.specialConditions||"") + " " + (obj.goodsDesc||"")).toLowerCase();
+  return SPECIAL_TEXT_TRIGGERS.some(t => hay.includes(t));
+}
+
+function needsSpecialRequest(obj){
+  const reasons = [];
+
+  const sum = Number(obj.sumInsured || 0);
+  if(sum > LIMIT_SUM) reasons.push(`Forsikringssum over DKK ${LIMIT_SUM.toLocaleString("da-DK")}`);
+
+  if(obj.goodsGroup === "Andet gods (speciel forespørgsel)") reasons.push("Varegruppe: Andet gods");
+
+  if(countryTriggersSpecial(obj.fromCountry) || countryTriggersSpecial(obj.toCountry)){
+    reasons.push("Rute involverer særligt land (sanktion/risiko)");
+  }
+
+  if(textTriggersSpecial(obj)){
+    reasons.push("Indhold/tekst indikerer militær/dual-use/højrisiko (manuel vurdering)");
+  }
+
+  // Køle/fryse udvidet dækning → special
+  if(obj.goodsGroup === "Køle-/frysegods"){
+    const sc = (obj.specialConditions || "").toLowerCase();
+    if(sc.includes("udvidet dækning") || sc.includes("frozen food extension")){
+      reasons.push("Køle-/frysegods med udvidet dækning (manuel præmie)");
+    }
+  }
+
+  return { special: reasons.length > 0, reasons };
+}
+
+function mapDKPartnerArea(other){
+  if(!other) return "Øvrige verden";
+  if(other === "USA" || other === "Canada") return "USA og Canada";
+
+  // Tyrkiet/Rusland/Belarus mm. ligger i denne række i din tabel
+  const nordatl = new Set([
+    "Rusland","Tyrkiet","Hviderusland (Belarus)","Australien","New Zealand","Japan","Taiwan"
+  ]);
+  if(nordatl.has(other)) return "Nordatlanten, Rusland, Hviderusland, Tyrkiet, Australien, New Zealand, Japan, Hong Kong og Taiwan  ";
+  if(other === "Kina" || other === "Indien" || other === "Pakistan" || other === "Bangladesh" || other === "Sri Lanka" ||
+     other === "Thailand" || other === "Vietnam" || other === "Cambodja" || other === "Laos" || other === "Malaysia" ||
+     other === "Singapore" || other === "Indonesien" || other === "Filippinerne" || other === "Mongoliet" ||
+     other === "Sydkorea" || other === "Nordkorea") return "Øvrige mellem og fjernøsten";
+
+  if(NW_EUROPE.has(other)) return "Det nordvestlige Europa";
+  if(SW_EUROPE_PL_CZ.has(other)) return "Det sydvestlige Europa, Polen og Tjekkiet ";
+  if(BALTICS_AND_OTHER_EU.has(other) || EUROPE.has(other)) return "Øvrige Europa inkl. Baltikum og Ukraine";
+
+  return "Øvrige verden";
+}
+
+function determineArea(obj){
+  const from = obj.fromCountry;
+  const to = obj.toCountry;
+
+  // Hvis ophold (ikke relevant for raterne her)
+  if(obj.insuranceType !== "transport") return null;
+
+  if(from === "Danmark" && to === "Danmark") return "Mellem danske pladser";
+  if(from === "Danmark" && to !== "Danmark") return mapDKPartnerArea(to);
+  if(to === "Danmark" && from !== "Danmark") return mapDKPartnerArea(from);
+
+  const fromEU = EUROPE.has(from);
+  const toEU = EUROPE.has(to);
+
+  if(fromEU && toEU) return "Mellem Europæiske pladser";
+  if((fromEU && !toEU) || (!fromEU && toEU)) return "Mellem Europa og øvrige verden";
+
+  return "Øvrige verden";
+}
+
+function calcAutoPremium(obj){
+  const area = determineArea(obj);
+  if(!area) return null;
+
+  const goodsKey = mapGoodsGroupToRateKey(obj.goodsGroup || "");
+  const lane = isFly(obj) ? "air" : "surface";
+
+  const rate = TRANSPORT_RATES?.[area]?.[lane]?.[goodsKey];
+  if(rate == null) return null;
+
+  const sum = Number(obj.sumInsured || 0);
+
+  // Grundpræmie (uden selvrisiko-index)
+  const basePremium = sum * rate;
+
+  // Selvrisiko-justering
+  const { index, factor } = deductibleFactor(obj);
+  const premium = basePremium * factor;
+
+  return { premium, basePremium, rate, area, lane, goodsKey, deductibleIndex: index };
+}
+
+// storage helpers
+function loadLS(key, fallback){
+  try { return JSON.parse(localStorage.getItem(key) || ""); } catch { return fallback; }
+}
+function saveLS(key, value){
+  localStorage.setItem(key, JSON.stringify(value));
+}
+function genId(prefix="CS"){
+  return `${prefix}-${Date.now()}-${Math.floor(Math.random()*1e6)}`;
+}
+function fmtDKK(n){
+  if(n == null || isNaN(n)) return "—";
+  return `DKK ${Number(n).toLocaleString("da-DK", {maximumFractionDigits:0})}`;
+}
+
+
+let currentUser = null;
+let activeQuote = null;  
+
+function applyRoleUI(){
+  const isAdmin = currentUser?.role === "admin";
+
+  if(navHistory){
+    navHistory.textContent = isAdmin ? "Udstedte policer" : "Mine vareforsikringer";
+  }
+
+  navCreate?.classList.toggle("hidden", isAdmin);
+// ✅ Skjul "Kladder" for admin
+navDrafts?.classList.toggle("hidden", isAdmin);
+
+// ✅ Skjul draftBanner + draftsView for admin (så der ikke blinker noget)
+draftBanner?.classList.toggle("hidden", isAdmin);
+draftsView?.classList.toggle("hidden", isAdmin);
+  document.getElementById("navAdminUsers")?.classList.toggle("hidden", !isAdmin);
+
+
+  // ✅ NY: skjul admin-users view for almindelige brugere
+  document.getElementById("adminUsersView")?.classList.toggle("hidden", !isAdmin);
+
+  document.getElementById("customerWelcome")?.classList.toggle("hidden", isAdmin);
+  document.getElementById("adminWelcome")?.classList.toggle("hidden", !isAdmin);
+
+  mainGrid?.classList.toggle("hidden", isAdmin);
+
+  document.getElementById("adminPolicyFilter")?.classList.add("hidden");
+
+  showView("welcome");
+
+  if(isAdmin){
+    if (typeof renderAdminUsers === "function") renderAdminUsers();
+    if (typeof renderHistory === "function") renderHistory();
+  }
+}
+
+function setLoggedIn(username){
+  document.getElementById("loginView")?.classList.add("hidden");
+  document.getElementById("appView")?.classList.remove("hidden");
+  document.getElementById("appNav")?.classList.remove("hidden");
+  document.getElementById("logoutBtn")?.classList.remove("hidden");
+  const pill = document.getElementById("userPill");
+  if(pill) pill.textContent = `Logget ind: ${username}`;
+
+  if(typeof applyRoleUI === "function") applyRoleUI();
+  if(typeof showView === "function") showView("welcome");
+if(currentUser?.role !== "admin"){
+  issuePolicyBtn?.classList.add("hidden");
+}
+}
+
+function setLoggedOut(){
+  currentUser = null;
+  localStorage.removeItem("cs_user");
+  localStorage.removeItem("cs_token");
+
+  document.getElementById("loginView")?.classList.remove("hidden");
+  document.getElementById("appView")?.classList.add("hidden");
+  document.getElementById("appNav")?.classList.add("hidden");
+  document.getElementById("logoutBtn")?.classList.add("hidden");
+  const pill = document.getElementById("userPill");
+  if(pill) pill.textContent = "Ikke logget ind";
+}
+
+  document.getElementById("fillDemoBtn").addEventListener("click", () => {
+   document.getElementById("loginUsername").value = DEMO_USER;
+document.getElementById("loginPassword").value = DEMO_PASS;
+});
+
+document.getElementById("polApply")?.addEventListener("click", () => renderHistory());
+document.getElementById("polClear")?.addEventListener("click", () => {
+  document.getElementById("polFrom").value = "";
+  document.getElementById("polTo").value = "";
+  renderHistory();
+});
+  
+
+  const loginBtn = document.getElementById("loginBtn");
+const usernameInput = document.getElementById("loginUsername");
+const passwordInput = document.getElementById("loginPassword");
+
+// Logout listener (kun én gang, ikke inde i login)
+logoutBtn.addEventListener("click", () => setLoggedOut());
+
+loginBtn.addEventListener("click", async (e) => {
+  e.preventDefault();
+
+  const u = (usernameInput.value || "").trim();
+  const p = (passwordInput.value || "");
+
+  try {
+    loginToast.style.display = "none";
+
+    const out = await api("/api/auth/login", {
+      method: "POST",
+      auth: false,
+      body: { username: u, password: p }
+    });
+
+    localStorage.setItem("cs_token", out.token);
+    localStorage.setItem("cs_user", JSON.stringify(out.user));
+    currentUser = out.user;
+
+    setLoggedIn(currentUser.username);
+    // post-login (må ikke ødelægge login)
+    try { if (typeof renderAdminUsers === "function") await renderAdminUsers(); } catch (x) { console.error("renderAdminUsers failed", x); }
+    try { if (typeof renderAdminBox === "function") await renderAdminBox(); } catch (x) { console.error("renderAdminBox failed", x); }
+    try { if (typeof renderQuoteBox === "function") await renderQuoteBox(); } catch (x) { console.error("renderQuoteBox failed", x); }
+
+  } catch (err) {
+    console.error("LOGIN FAILED", err);
+    loginToast.textContent = "Forkert login eller server-fejl: " + (err?.message || err);
+    loginToast.style.display = "block";
+  }
+});
+
+
+  /*************************
+   * 4) App logic
+   *************************/
+  const tabTransport = document.getElementById("tabTransport");
+  const tabOphold = document.getElementById("tabOphold");
+  const transportOnly = document.getElementById("transportOnly");
+  const kpiType = document.getElementById("kpiType");
+  const kpiFilled = document.getElementById("kpiFilled");
+  const preview = document.getElementById("preview");
+
+  let insuranceType = "transport"; // "transport" | "ophold"
+
+  function setType(type){
+    insuranceType = type;
+    const isTransport = type === "transport";
+
+    tabTransport.classList.toggle("active", isTransport);
+    tabOphold.classList.toggle("active", !isTransport);
+
+    transportOnly.classList.toggle("hidden", !isTransport);
+    kpiType.textContent = isTransport ? "Transportforsikring" : "Opholdsforsikring";
+
+    // Toggle required attributes for transport-only fields
+    const requiredInTransport = ["incoterms","departureDate","fromCountry","fromCity","toCountry","toCity"];
+    requiredInTransport.forEach(id => {
+      const el = document.getElementById(id);
+      if(!el) return;
+      if(isTransport) el.setAttribute("required", "required");
+      else el.removeAttribute("required");
+    });
+
+    // transportMode radios required
+    document.querySelectorAll('input[name="transportMode"]').forEach(r => {
+      if(isTransport) r.setAttribute("required", "required");
+      else r.removeAttribute("required");
+    });
+
+    updatePreview();
+renderDraftBanner();
+renderTemplateSelect();
+  }
+
+  tabTransport.addEventListener("click", () => setType("transport"));
+  tabOphold.addEventListener("click", () => setType("ophold"));
+
+  // Fill country selects
+  fillCountrySelect(document.getElementById("country"), true);
+  fillCountrySelect(document.getElementById("fromCountry"), true);
+  fillCountrySelect(document.getElementById("toCountry"), true);
+
+  // viaCountry has placeholder but optional
+  fillCountrySelect(document.getElementById("viaCountry"), false);
+  document.getElementById("viaCountry").insertAdjacentHTML("afterbegin", `<option value="" selected>-- Vælg land --</option>`);
+
+  // Bind info buttons
+  document.querySelectorAll(".info-btn").forEach(btn => {
+    btn.addEventListener("click", () => openModal(btn.dataset.info));
+  });
+  document.getElementById("modalClose").addEventListener("click", closeModal);
+  document.getElementById("modalBackdrop").addEventListener("click", (e) => {
+    if(e.target.id === "modalBackdrop") closeModal();
+  });
+  document.addEventListener("keydown", (e) => {
+    if(e.key === "Escape") closeModal();
+  });
+
+  const form = document.getElementById("insuranceForm");
+  const resetBtn = document.getElementById("resetBtn");
+const getQuoteBtn = document.getElementById("getQuoteBtn");
+const quoteBox = document.getElementById("quoteBox");
+const acceptQuoteBtn = document.getElementById("acceptQuoteBtn");
+const issuePolicyBtn = document.getElementById("issuePolicyBtn");
+const printPolicyBtn = document.getElementById("printPolicyBtn");
+
+const adminDivider = document.getElementById("adminDivider");
+const adminTitle = document.getElementById("adminTitle");
+const adminBox = document.getElementById("adminBox");
+
+function draftKey(type){
+  const u = currentUser?.username || "anon";
+  return `cargosafe:draft:${u}:${type}`;
+}
+
+function templatesKey(){
+  const u = currentUser?.username || "anon";
+  return `cargosafe:templates:${u}`;
+}
+
+function getTemplates(){
+  try{
+    const raw = localStorage.getItem(templatesKey());
+    const arr = JSON.parse(raw || "[]");
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){
+    return [];
+  }
+}
+
+function saveTemplates(list){
+  localStorage.setItem(templatesKey(), JSON.stringify(list || []));
+}
+
+function makeId(){
+  if(window.crypto?.randomUUID) return crypto.randomUUID();
+  return String(Date.now()) + "_" + Math.random().toString(16).slice(2);
+}
+
+function renderTemplateSelect(){
+  if(!templateSelect) return;
+
+  const all = getTemplates()
+    .filter(t => t?.insuranceType === insuranceType)
+    .sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
+
+  templateSelect.innerHTML = [
+  `<option value="">Indlæs skabelon…</option>`,
+  ...all.map(t => `<option value="${esc(t.id)}">${esc(t.name || "(uden navn)")}</option>`)
+].join("");
+
+  applyTemplateBtn?.classList.toggle("hidden", all.length === 0);
+}
+
+function renderTemplatesView(){
+  if(!templatesBox || !templatesList) return;
+
+  const types = {
+    transport: "Transport (Vareforsikring)",
+    ophold: "Opholdsforsikring"
+  };
+
+  const all = getTemplates()
+    .sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
+
+  if(all.length === 0){
+    templatesBox.textContent = "Ingen skabeloner endnu.";
+    templatesList.innerHTML = "";
+    return;
+  }
+
+  templatesBox.textContent = "";
+  templatesList.innerHTML = all.map(t => {
+    const when = new Date(t.updatedAt || Date.now()).toLocaleString("da-DK");
+    const typeLabel = types[t.insuranceType] || t.insuranceType || "Ukendt";
+
+    return `
+      <div class="card" style="padding:14px;">
+        <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+          <div>
+            <b>${esc(t.name || "(uden navn)")}</b><br/>
+            <span class="small">Type: ${esc(typeLabel)} · Sidst gemt: ${esc(when)}</span>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn" data-template-action="restore" data-template-id="${esc(t.id)}" type="button">Gendan</button>
+            <button class="btn ghost" data-template-action="rename" data-template-id="${esc(t.id)}" type="button">Omdøb</button>
+            <button class="btn ghost" data-template-action="delete" data-template-id="${esc(t.id)}" type="button">Slet</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function addTemplateFromCurrentForm(){
+  if(!form) return;
+
+  const data = getFormData();
+  if(isFormEmpty(data)){
+    alert("Kan ikke gemme en tom skabelon. Udfyld mindst ét felt først.");
+    return;
+  }
+
+  const suggested = insuranceType === "transport"
+    ? "Transport med Maersk (Frankrig)"
+    : "Ophold – standard";
+
+  const name = prompt("Navngiv skabelonen:", suggested);
+  if(!name || !name.trim()) return;
+
+  const list = getTemplates();
+  list.unshift({
+    id: makeId(),
+    name: name.trim(),
+    insuranceType,
+    updatedAt: Date.now(),
+    data
+  });
+
+  saveTemplates(list);
+  renderTemplateSelect();
+  renderTemplatesView();
+  alert("Skabelon gemt ✅");
+}
+
+function deleteTemplate(id){
+  const list = getTemplates().filter(t => t.id !== id);
+  saveTemplates(list);
+  renderTemplateSelect();
+  renderTemplatesView();
+}
+
+function renameTemplate(id){
+  const list = getTemplates();
+  const t = list.find(x => x.id === id);
+  if(!t) return;
+
+  const name = prompt("Nyt navn til skabelonen:", t.name || "");
+  if(!name || !name.trim()) return;
+
+  t.name = name.trim();
+  t.updatedAt = Date.now();
+  saveTemplates(list);
+
+  renderTemplateSelect();
+  renderTemplatesView();
+}
+
+function isFormEmpty(data){
+  // ignorer “tekniske” felter
+  const ignore = new Set(["insuranceType", "transportMode"]);
+  return !Object.entries(data || {}).some(([k,v]) => {
+    if(ignore.has(k)) return false;
+    return String(v ?? "").trim().length > 0;
+  });
+}
+
+let draftTimer = null;
+
+function saveDraftNow(){
+  if(!form) return;
+  const data = getFormData();
+  if(isFormEmpty(data)){
+    localStorage.removeItem(draftKey(insuranceType));
+    renderDraftBanner();
+    return;
+  }
+  localStorage.setItem(draftKey(insuranceType), JSON.stringify({
+    updatedAt: Date.now(),
+    data
+  }));
+  renderDraftBanner();
+}
+
+function scheduleDraftSave(){
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(saveDraftNow, 500);
+}
+
+function loadDraft(type){
+  try{
+    return JSON.parse(localStorage.getItem(draftKey(type)) || "null");
+  }catch(e){
+    return null;
+  }
+}
+
+function deleteDraft(type){
+  localStorage.removeItem(draftKey(type));
+  renderDraftBanner();
+  renderDraftsView();
+}
+
+function applyDraft(payload){
+  if(!payload?.data) return;
+
+  const data = payload.data;
+
+  // skift type først (så required-felter + preview matcher)
+  if(data.insuranceType && data.insuranceType !== insuranceType){
+    setType(data.insuranceType);
+  }
+
+  // udfyld felter
+  for(const [k,v] of Object.entries(data)){
+    if(k === "insuranceType" || k === "transportMode") continue;
+    const el = form.elements[k];
+    if(!el) continue;
+
+    // RadioNodeList/inputs
+    if(typeof el === "object" && "value" in el){
+      el.value = v ?? "";
+    }
+  }
+
+  // transportMode radio
+  if(data.transportMode){
+    const r = form.querySelector(`input[name="transportMode"][value="${CSS.escape(data.transportMode)}"]`);
+    if(r) r.checked = true;
+  }
+
+  if(typeof updatePreview === "function") updatePreview();
+  renderDraftBanner();
+}
+
+function renderDraftBanner(){
+  if(!draftBanner) return;
+  const d = loadDraft(insuranceType);
+  draftBanner.classList.toggle("hidden", !d);
+}
+
+function renderDraftsView(){
+  if(!draftsBox || !draftsList) return;
+
+  const types = [
+    { type:"transport", label:"Transport (Vareforsikring)" },
+    { type:"ophold", label:"Opholdsforsikring" }
+  ];
+
+  const cards = [];
+
+  for(const t of types){
+    const d = loadDraft(t.type);
+    if(!d) continue;
+
+    const when = new Date(d.updatedAt);
+    const whenTxt = when.toLocaleString("da-DK");
+
+    cards.push(`
+      <div class="card" style="padding:14px;">
+        <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+          <div>
+            <b>${esc(t.label)}</b><br/>
+            <span class="small">Sidst gemt: ${esc(whenTxt)}</span>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn" data-draft-action="restore" data-draft-type="${esc(t.type)}" type="button">Gendan</button>
+            <button class="btn ghost" data-draft-action="delete" data-draft-type="${esc(t.type)}" type="button">Slet</button>
+          </div>
+        </div>
+      </div>
+    `);
+  }
+
+  if(cards.length === 0){
+    draftsBox.textContent = "Ingen kladder endnu.";
+    draftsList.innerHTML = "";
+    return;
+  }
+
+  draftsBox.textContent = "";
+  draftsList.innerHTML = cards.join("");
+renderTemplatesView();
+}
+
+// autosave mens man skriver
+form?.addEventListener("input", scheduleDraftSave);
+form?.addEventListener("change", scheduleDraftSave);
+
+// banner-knapper
+draftRestoreBtn?.addEventListener("click", () => {
+  const d = loadDraft(insuranceType);
+  if(d) applyDraft(d);
+});
+
+draftDeleteBtn?.addEventListener("click", () => {
+  deleteDraft(insuranceType);
+});
+
+saveTemplateBtn?.addEventListener("click", () => {
+  addTemplateFromCurrentForm();
+});
+
+applyTemplateBtn?.addEventListener("click", () => {
+  const id = templateSelect?.value;
+  if(!id) return;
+
+  const t = getTemplates().find(x => x.id === id);
+  if(!t) return;
+
+  showView("create");
+  applyDraft(t);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+// drafts view knapper (delegation)
+draftsList?.addEventListener("click", (e) => {
+  const btn = e.target?.closest?.("button[data-draft-action]");
+  if(!btn) return;
+  const action = btn.getAttribute("data-draft-action");
+  const type = btn.getAttribute("data-draft-type");
+  if(!type) return;
+
+  if(action === "restore"){
+    const d = loadDraft(type);
+    if(d){
+      showView("create");
+      applyDraft(d);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+  if(action === "delete"){
+    deleteDraft(type);
+  }
+});
+
+templatesList?.addEventListener("click", (e) => {
+  const btn = e.target?.closest?.("button[data-template-action]");
+  if(!btn) return;
+
+  const action = btn.getAttribute("data-template-action");
+  const id = btn.getAttribute("data-template-id");
+  if(!id) return;
+
+  if(action === "restore"){
+    const t = getTemplates().find(x => x.id === id);
+    if(t){
+      showView("create");
+      applyDraft(t);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+
+  if(action === "rename"){
+    renameTemplate(id);
+  }
+
+  if(action === "delete"){
+    if(confirm("Vil du slette skabelonen?")){
+      deleteTemplate(id);
+    }
+  }
+});
+
+function showView(view){
+  const isAdmin = currentUser?.role === "admin";
+
+  // ✅ gem kladde hvis vi forlader create (skal være først!)
+  const wasInCreate = !mainGrid?.classList.contains("hidden");
+  if(wasInCreate && view !== "create" && !isAdmin){
+    saveDraftNow();
+  }
+
+  // ✅ Admin må ikke gå ind i create
+if(isAdmin && (view === "create" || view === "drafts")) view = "history";
+
+  // ✅ admin filter (kun synlig i history for admin)
+  document.getElementById("adminPolicyFilter")
+    ?.classList.toggle("hidden", !(isAdmin && view === "history"));
+
+  // ✅ når vi går IND i create/drafts
+  if(view === "create"){
+    renderDraftBanner();
+    renderTemplateSelect();
+templateTools?.classList.toggle("hidden", isAdmin || view !== "create");
+  } else if(view === "drafts"){
+    renderDraftsView();
+    renderTemplatesView();
+  }
+
+  // ✅ vis/skjul views
+  welcomeView?.classList.toggle("hidden", view !== "welcome");
+  mainGrid?.classList.toggle("hidden", view !== "create");
+  historyView?.classList.toggle("hidden", view !== "history");
+  specialView?.classList.toggle("hidden", view !== "special");
+  draftsView?.classList.toggle("hidden", view !== "drafts");
+  claimView?.classList.toggle("hidden", view !== "claim");
+
+  const adminUsersView = document.getElementById("adminUsersView");
+  adminUsersView?.classList.toggle("hidden", view !== "adminUsers");
+profileView?.classList.toggle("hidden", view !== "profile");
+
+  // ✅ active nav
+  navWelcome?.classList.toggle("active", view === "welcome");
+  navCreate?.classList.toggle("active", view === "create");
+  navHistory?.classList.toggle("active", view === "history");
+  navAdminUsers?.classList.toggle("active", view === "adminUsers");
+  navDrafts?.classList.toggle("active", view === "drafts");
+  navClaim?.classList.toggle("active", view === "claim");
+navProfile?.classList.toggle("active", view === "profile");
+
+
+  // ✅ claim skjules for admin
+navClaim?.classList.toggle("hidden", currentUser?.role === "admin");
+navProfile?.classList.toggle("hidden", isAdmin);
+// ✅ Skabeloner/kladder UI skjules for admin
+templateTools?.classList.toggle("hidden", isAdmin);
+draftBanner?.classList.toggle("hidden", isAdmin);
+}
+
+navWelcome?.addEventListener("click", () => showView("welcome"));
+navClaim?.addEventListener("click", () => showView("claim"));
+
+navDrafts?.addEventListener("click", () => {
+  showView("drafts");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+navCreate?.addEventListener("click", () => {
+  if(currentUser?.role === "admin") return;   // ✅ admin må ikke ind i create
+  showView("create");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+navSpecial?.addEventListener("click", async () => {
+  showView("special");
+  await renderSpecialRequests();
+});
+
+navHistory?.addEventListener("click", async () => {
+  showView("history");
+  await renderHistory();   // laver vi i næste step
+});
+
+navAdminUsers?.addEventListener("click", () => {
+  showView("adminUsers");
+  if (typeof renderAdminUsers === "function") renderAdminUsers();
+});
+
+startBtn?.addEventListener("click", () => {
+  if(currentUser?.role === "admin") return;
+  showView("create");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+skipWelcomeBtn?.addEventListener("click", () => {
+  if(currentUser?.role === "admin") return;
+  showView("create");
+});
+
+printPolicyBtn?.addEventListener("click", () => {
+  const q = activeQuote;
+  if(!q || q.status !== "issued"){
+    alert("Ingen udstedt police at printe.");
+    return;
+  }
+  openPolicyPrintView(q);
+});
+
+acceptQuoteBtn.addEventListener("click", async () => {
+  if(!activeQuote?.id) return;
+
+  // (valgfrit men anbefalet) undgå dobbeltklik
+  acceptQuoteBtn.disabled = true;
+
+  try{
+    // accept -> backend udsteder policen nu
+    const out = await api(`/api/quotes/${activeQuote.id}/accept`, { method: "POST" });
+
+    // hent frisk state (så activeQuote bliver 'issued')
+    const qOut = await api("/api/quotes", { method: "GET" });
+    const myQuotes = qOut?.quotes || [];
+    activeQuote = myQuotes.find(q => q.id === activeQuote.id) || activeQuote;
+
+    await renderQuoteBox();
+
+    if(out?.policyNumber){
+      alert(`Police udstedt ✅\nPolicenr.: ${out.policyNumber}`);
+    } else {
+      alert("Tilbud accepteret ✅");
+    }
+  } catch(err){
+    alert("Fejl ved accept: " + (err?.message || err));
+  } finally {
+    acceptQuoteBtn.disabled = false;
+  }
+});
+
+issuePolicyBtn.addEventListener("click", async () => {
+  if(!activeQuote?.id){
+    alert("Ingen quote valgt.");
+    return;
+  }
+
+  try{
+    const out = await api(`/api/quotes/${activeQuote.id}/issue`, { method: "POST" });
+
+    const qOut = await api("/api/quotes", { method: "GET" });
+    const myQuotes = qOut?.quotes || [];
+    activeQuote = myQuotes.find(q => q.id === activeQuote.id) || activeQuote;
+
+    await renderQuoteBox();
+    alert(`Police udstedt ✅\nPolicenr.: ${out.policyNumber}`);
+  } catch(err){
+    alert("Fejl ved udstedelse: " + (err?.message || err));
+  }
+});
+
+// ---------- Document Upload -> OCR -> Autofill ----------
+const docUpload = document.getElementById("docUpload");
+const docUploadStatus = document.getElementById("docUploadStatus");
+const docUploadClear = document.getElementById("docUploadClear");
+
+docUploadClear?.addEventListener("click", () => {
+  // 1) ryd fil-input
+  if(docUpload) docUpload.value = "";
+
+  // 2) ryd status
+  setStatus("");
+
+  // 3) (valgfrit men anbefalet) ryd de felter som blev autofyldt
+  // fx: document.getElementById("bl").value = "";
+  // og/eller fjern opsummeringen du putter i goodsDesc hvis du vil
+});
+
+docUpload?.addEventListener("change", async () => {
+  const file = docUpload.files?.[0];
+  if(!file) return;
+
+  setStatus("Indlæser dokument…");
+
+  try{
+    const img = await fileToImage(file);          // PDF -> render page 1, Image -> load
+    setStatus("Kører OCR… (kan tage lidt tid)");
+    const text = await runOCR(img);
+console.log("OCR TEXT (first 1200 chars):\n", text.slice(0, 1200));
+
+
+    setStatus("Fortolker dokument…");
+    const docType = detectDocType(text);
+    let extracted = parseByType(docType, text);
+
+// fallback: hvis UNKNOWN eller tomt, så prøv generisk parsing
+if(!extracted || Object.keys(extracted).length === 0 || docType === "UNKNOWN"){
+  extracted = { ...parseGeneric(text), ...extracted };
+}
+
+    // Vis “hvad vi fandt” (hurtigt)
+    setStatus(`Fundet: ${docType}. Udfylder felter…`);
+
+    applyToCargoSafeForm(extracted, docType);
+
+    // Smid også en “opsummering” ind i goodsDesc (så brugeren altid kan se data)
+    appendToGoodsDesc(extracted, docType);
+
+    setStatus(`✅ Udfyldt fra ${docType}. Tjek felterne og ret hvis nødvendigt.`);
+  }catch(err){
+    console.error(err);
+    setStatus("❌ Kunne ikke læse dokumentet. Prøv en skarpere scanning eller PDF.");
+  }finally{
+    docUpload.value = ""; // reset input (så samme fil kan vælges igen)
+  }
+});
+
+function setStatus(msg){
+  if(docUploadStatus) docUploadStatus.textContent = msg;
+}
+
+async function fileToImage(file){
+  if(file.type === "application/pdf"){
+    const ab = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: ab }).promise;
+    const page = await pdf.getPage(1);
+
+    const viewport = page.getViewport({ scale: 3 });  // øger OCR accuracy
+    const canvas = document.createElement("canvas");
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+
+    const ctx = canvas.getContext("2d");
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    return canvas; // canvas fungerer fint til tesseract
+  }
+
+  if(file.type.startsWith("image/")){
+  const url = URL.createObjectURL(file);
+  const img = await new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = reject;
+    i.src = url;
+  });
+
+  // ✅ Tegn billedet på et canvas i højere opløsning
+  const canvas = document.createElement("canvas");
+  const scale = 3; // prøv 3 (eller 4 hvis stadig dårligt)
+  canvas.width  = Math.round(img.naturalWidth  * scale);
+  canvas.height = Math.round(img.naturalHeight * scale);
+
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  // ✅ Forbedr kontrast til OCR
+  preprocessCanvasForOCR(canvas);
+
+  URL.revokeObjectURL(url);
+  return canvas;
+}
+
+  throw new Error("Unsupported file type: " + file.type);
+}
+
+function preprocessCanvasForOCR(canvas){
+  const ctx = canvas.getContext("2d");
+  const imgData = ctx.getImageData(0,0,canvas.width, canvas.height);
+  const d = imgData.data;
+
+  // Grayscale + lidt kontrast + threshold (binarize)
+  for(let i=0;i<d.length;i+=4){
+    const r = d[i], g = d[i+1], b = d[i+2];
+    let v = (0.299*r + 0.587*g + 0.114*b); // grayscale
+
+    // kontrast boost
+    v = (v - 128) * 1.35 + 128;
+
+    // threshold (justér 155–190 hvis nødvendigt)
+    v = v > 170 ? 255 : 0;
+
+    d[i] = d[i+1] = d[i+2] = v;
+  }
+  ctx.putImageData(imgData, 0, 0);
+}
+
+async function runOCR(imageOrCanvas){
+  const res = await Tesseract.recognize(imageOrCanvas, "eng+deu+dan", {
+    logger: m => {
+      // valgfrit: du kan vise progress her
+      // console.log(m);
+    }
+  });
+  // Normalize: fjern dobbeltspaces, ensret linjeskift
+  return (res.data.text || "")
+    .replace(/\r/g, "\n")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function detectDocType(t){
+  const s = (t || "").toUpperCase();
+
+  // CMR (dansk/tysk/engelsk)
+  if (
+    s.includes("CMR") ||
+    s.includes("FRAGTBREV") ||
+    s.includes("FRACHTBRIEF") ||
+    s.includes("INTERNATIONALER FRACHTBRIEF") ||
+    s.includes("INTERNATIONAL CONSIGNMENT NOTE")
+  ) return "CMR";
+
+  // Sea waybill / B/L
+  if (
+    s.includes("SEA WAYBILL") ||
+    s.includes("WAYBILL") && (s.includes("VESSEL") || s.includes("PORT OF LOADING") || s.includes("PORT OF DISCHARGE")) ||
+    s.includes("BILL OF LADING") ||
+    s.includes("B.L. NO")
+  ) return "SEA_WAYBILL";
+
+  // Air waybill
+  if (
+    s.includes("AIR WAYBILL") ||
+    s.includes("AIRWAYBILL") ||
+    s.includes("AWB")
+  ) return "AIR_WAYBILL";
+
+  return "UNKNOWN";
+}
+
+function parseByType(type, text){
+  switch(type){
+    case "SEA_WAYBILL": return parseSeaWaybill(text);
+    case "AIR_WAYBILL": return parseAirWaybill(text);
+    case "CMR": return parseCMR(text);
+    default: return parseGeneric(text);
+  }
+}
+
+// ---- Parsers (MVP) ----
+function grabBetween(text, startLabel, endLabel){
+  const re = new RegExp(`${startLabel}[\\s\\S]*?\\n([\\s\\S]*?)(?=\\n\\s*${endLabel}|$)`, "i");
+  const m = text.match(re);
+  return m ? m[1].trim() : "";
+}
+
+function firstMatch(text, regex){
+  const m = text.match(regex);
+  return m ? (m[1] || m[0]).trim() : "";
+}
+
+function parseSeaWaybill(t){
+  return {
+    docNo: firstMatch(t, /Document No\.\s*([A-Z0-9\-\/]+)/i),
+    blNo:  firstMatch(t, /B\.L\. No\.\s*([A-Z0-9\-\/]+)/i),
+    shipper: grabBetween(t, "Shipper", "Consignee"),
+    consignee: grabBetween(t, "Consignee", "Notify"),
+    placeOfReceipt: firstMatch(t, /Place of receipt\s*([A-Z ,.\-]+)/i),
+    portOfLoading: firstMatch(t, /Port of loading\s*([A-Z ,.\-]+)/i),
+    portOfDischarge: firstMatch(t, /Port of discharge\s*([A-Z ,.\-]+)/i),
+    placeOfDelivery: firstMatch(t, /Place of delivery\s*([A-Z ,.\-]+)/i),
+    goods: grabBetween(t, "Number and kind of packages: description of goods", "Gross Weight")
+           || grabBetween(t, "Number and kind of packages", "Gross Weight"),
+    grossWeightKg: firstMatch(t, /Gross Weight\s*in kilos\s*([0-9.,]+)/i),
+    measurementM3: firstMatch(t, /Measurement\s*in cubic meters\s*([0-9.,]+)/i),
+  };
+}
+
+function parseAirWaybill(t){
+  return {
+    awbNo: firstMatch(t, /\b(\d{3}-\d{8})\b/), // ofte 3-8 format
+    shipper: grabBetween(t, "Shipper", "Consignee") || grabBetween(t, "Shipper's Name and Address", "Consignee"),
+    consignee: grabBetween(t, "Consignee", "Issuing") || grabBetween(t, "Consignee's Name and Address", "Issuing"),
+    airportFrom: firstMatch(t, /Airport of Departure\s*([A-Z]{3})/i),
+    airportTo: firstMatch(t, /Airport of Destination\s*([A-Z]{3})/i),
+    goods: grabBetween(t, "Nature and Quantity of Goods", "Prepaid") || grabBetween(t, "Nature & qty of goods", "Prepaid"),
+    pieces: firstMatch(t, /No\.\s*of\s*pieces\s*RCP\s*([0-9]+)/i),
+    grossWeightKg: firstMatch(t, /Gross Weight\s*kg\s*([0-9.,]+)/i),
+  };
+}
+
+function parseCMR(t){
+  // CMR er sværere i OCR, men vi kan typisk fange “Afsender” og “Modtager” + nogle nøgletal
+  const shipper = grabBetween(t, "Afsender", "Modtager") || grabBetween(t, "Sender", "Consignee");
+  const consignee = grabBetween(t, "Modtager", "Varen") || grabBetween(t, "Consignee", "Place");
+  const cmrNo = firstMatch(t, /Fragtbrevs\s*nr\.?\s*([A-Z0-9\-\/]+)/i) || "";
+  const pieces = firstMatch(t, /\bAntal\s*kolli\b.*?\b([0-9]{1,6})\b/i);
+  const grossWeightKg = firstMatch(t, /\bBruttovægt\b.*?\b([0-9][0-9.,]{0,10})\b/i);
+  const goods = firstMatch(t, /\bGodsets art\b[\s\S]*?\n([^\n]{3,120})/i);
+
+  return { cmrNo, shipper, consignee, pieces, grossWeightKg, goods };
+}
+
+function parseGeneric(t){
+  return {
+    // reference (B/L, AWB, CMR, Document No)
+    ref:
+      firstMatch(t, /B\.L\.?\s*No\.?\s*[:.]?\s*([A-Z0-9\-\/]+)/i) ||
+      firstMatch(t, /\bAWB\b\s*[:.]?\s*([0-9\-]+)/i) ||
+      firstMatch(t, /\bCMR\b\s*[:.]?\s*([A-Z0-9\-\/]+)/i) ||
+      firstMatch(t, /Document\s*No\.?\s*[:.]?\s*([A-Z0-9\-\/]+)/i) || "",
+
+    shipper:
+      grabBetween(t, "Shipper", "Consignee") ||
+      grabBetween(t, "Afsender", "Modtager") ||
+      grabBetween(t, "Sender", "Empfänger") || "",
+
+    consignee:
+      grabBetween(t, "Consignee", "Notify") ||
+      grabBetween(t, "Modtager", "Sted") ||
+      grabBetween(t, "Empfänger", "Frachtführer") || "",
+
+    goods:
+      grabBetween(t, "description of goods", "Gross Weight") ||
+      firstMatch(t, /Godsets art[\s\S]*?\n([^\n]{3,120})/i) || ""
+  };
+}
+
+// ---- Apply to your existing form IDs ----
+function applyToCargoSafeForm(d, docType){
+  // Dit “B/L / Fragtbrevs nr.” felt:
+  const bl = document.getElementById("bl");
+const bestRef = d.blNo || d.awbNo || d.cmrNo || d.docNo || d.ref || "";
+  if(bl && bestRef) bl.value = bestRef;
+
+  // Transportform (radio)
+  if(docType === "AIR_WAYBILL") setTransportMode("Fly");
+  if(docType === "SEA_WAYBILL") setTransportMode("Skib");
+  if(docType === "CMR") setTransportMode("Bil");
+
+  // From/To (MVP: vi sætter by hvis vi kan — lande kræver match til dine dropdown options)
+  // Sea Waybill:
+  if(d.portOfLoading) setText("fromCity", d.portOfLoading);
+  if(d.placeOfReceipt && !d.portOfLoading) setText("fromCity", d.placeOfReceipt);
+
+  if(d.portOfDischarge) setText("toCity", d.portOfDischarge);
+  if(d.placeOfDelivery && !d.portOfDischarge) setText("toCity", d.placeOfDelivery);
+
+  // Air Waybill: vi har kun airport codes – skriv dem i city-feltet som MVP
+  if(d.airportFrom) setText("fromCity", d.airportFrom);
+  if(d.airportTo) setText("toCity", d.airportTo);
+
+  // Goods desc: vi bruger din goodsDesc textarea som “samlefelt”
+  // (du har ikke separate fields til weight/volume/pieces, så vi samler det her)
+}
+
+function setText(id, val){
+  const el = document.getElementById(id);
+  if(el && val) el.value = val;
+}
+
+function setTransportMode(label){
+  const radios = document.querySelectorAll('input[name="transportMode"]');
+  radios.forEach(r => {
+    if(r.value === label) r.checked = true;
+  });
+}
+
+// ---- Put a neat summary into goodsDesc ----
+function appendToGoodsDesc(d, docType){
+  const goodsDesc = document.getElementById("goodsDesc");
+  if(!goodsDesc) return;
+
+  const lines = [];
+  lines.push(`Dokument: ${docType}`);
+
+  if(d.shipper) lines.push(`Afsender/Shipper: ${compact(d.shipper)}`);
+  if(d.consignee) lines.push(`Modtager/Consignee: ${compact(d.consignee)}`);
+
+  if(d.goods) lines.push(`Gods: ${compact(d.goods)}`);
+  if(d.pieces) lines.push(`Antal kolli: ${d.pieces}`);
+  if(d.grossWeightKg) lines.push(`Bruttovægt (kg): ${d.grossWeightKg}`);
+  if(d.measurementM3) lines.push(`Mål (m³): ${d.measurementM3}`);
+
+  // Tilføj (ikke overskriv) – så brugeren kan have egne noter også
+  const block = `\n\n--- Autofyldt fra dokument ---\n${lines.join("\n")}\n`;
+  if(!goodsDesc.value.includes("--- Autofyldt fra dokument ---")) {
+    goodsDesc.value = (goodsDesc.value || "").trim() + block;
+  } else {
+    // hvis der allerede er en block, så udskift den groft (enkelt)
+    goodsDesc.value = goodsDesc.value.replace(/--- Autofyldt fra dokument ---[\s\S]*$/m, block.trim());
+  }
+}
+
+function compact(s){
+  return s.replace(/\n+/g, ", ").replace(/\s{2,}/g, " ").trim();
+}
+getQuoteBtn.addEventListener("click", async () => {
+  const form = document.getElementById("insuranceForm");
+
+  // ✅ Stop hvis required-felter mangler
+  if(form && !form.reportValidity()){
+    const firstInvalid = form.querySelector(":invalid");
+    firstInvalid?.scrollIntoView({ behavior:"smooth", block:"center" });
+    firstInvalid?.focus();
+    return;
+  }
+
+  // ✅ Ekstra sikkerhed for transportMode (radio)
+  const isTransport = !document.getElementById("transportOnly")?.classList.contains("hidden");
+  if(isTransport && !document.querySelector('input[name="transportMode"]:checked')){
+    alert("Vælg transportform (Bane/Bil/Fly/Post/Skib/Andet).");
+    document.querySelector('input[name="transportMode"]')?.closest(".row")
+      ?.scrollIntoView({ behavior:"smooth", block:"center" });
+    return;
+  }
+  const data = getFormData();
+
+  const quote = {
+    data,
+    manual: false,
+    reasons: []
+  };
+
+  const special = needsSpecialRequest(data);
+
+  if (special.special) {
+    quote.status = "special_pending";
+    quote.reasons = special.reasons;
+  } else {
+    const calc = calcAutoPremium(data);
+
+    if (!calc) {
+      quote.status = "special_pending";
+      quote.reasons = ["Kunne ikke beregne automatisk rate for denne rute/opsætning."];
+    } else {
+      quote.status = "offered";
+      quote.premium = Math.round(calc.premium);
+      quote.basePremium = Math.round(calc.basePremium);
+      quote.deductibleIndex = calc.deductibleIndex;
+      quote.rate = calc.rate;
+      quote.area = calc.area;
+      quote.lane = calc.lane;
+    }
+  }
+
+  try {
+    await api("/api/quotes", {
+      method: "POST",
+      body: {
+        id: quote.id,
+        status: quote.status,
+        premium: quote.premium ?? null,
+        base_premium: quote.basePremium ?? null,
+        deductible_index: quote.deductibleIndex ?? null,
+        rate: quote.rate ?? null,
+        area: quote.area ?? null,
+        lane: quote.lane ?? null,
+        reasons: quote.reasons ?? [],
+        manual: quote.manual ?? false,
+        data: quote.data
+      }
+    });
+  } catch (err) {
+    alert("Kunne ikke gemme quote i backend: " + (err?.message || err));
+    return;
+  }
+
+  await renderQuoteBox();
+  if(typeof renderAdminBox === "function") await renderAdminBox();
+});
+// ✅ Admin – Brugere (Step 2) START
+
+const createUserBtn = document.getElementById("createUserBtn");
+const newUsername = document.getElementById("newUsername");
+const newPassword = document.getElementById("newPassword");
+const newRole = document.getElementById("newRole");
+const newCompanyName    = document.getElementById("newCompanyName");
+const newCVR            = document.getElementById("newCVR");
+const newCompanyAddress = document.getElementById("newCompanyAddress");
+const newContactName    = document.getElementById("newContactName");
+const newContactPhone   = document.getElementById("newContactPhone");
+const newContactEmail   = document.getElementById("newContactEmail");
+const adminUserToast = document.getElementById("adminUserToast");
+
+function showAdminUserToast(msg, isError=false){
+  if(!adminUserToast){ alert(msg); return; }
+  adminUserToast.textContent = msg;
+  adminUserToast.style.display = "block";
+  setTimeout(() => adminUserToast.style.display = "none", 3500);
+}
+
+async function renderAdminUsers(){
+  const isAdmin = currentUser?.role === "admin";
+  if(!isAdmin) return;
+  const adminUsersBox  = document.getElementById("adminUsersBox")
+const adminUserSearch = document.getElementById("adminUserSearch");
+const adminUserSearchHint = document.getElementById("adminUserSearchHint");
+adminUserSearch?.addEventListener("input", () => {
+  renderAdminUsers();
+});
+
+  if(!adminUsersBox) return;
+
+  if(typeof esc !== "function"){
+    adminUsersBox.innerHTML = "Fejl: esc() mangler (tjek at esc() står før renderAdminUsers).";
+    return;
+  }
+
+  try{
+    const out = await api("/api/admin/users", { method: "GET" });
+    const users = out?.users || [];
+
+    if(users.length === 0){
+      adminUsersBox.innerHTML = "Ingen brugere fundet.";
+      return;
+    }
+
+const q = (adminUserSearch?.value || "").trim().toLowerCase();
+
+let shown = users;
+
+if(q){
+  shown = users.filter(u => {
+    const hay = [
+      u.username,
+      u.companyName || u.company_name,
+      u.cvr,
+      u.companyAddress || u.company_address,
+      u.contactName || u.contact_name,
+      u.contactPhone || u.contact_phone,
+      u.contactEmail || u.contact_email
+    ].filter(Boolean).join(" ").toLowerCase();
+
+    return hay.includes(q);
+  });
+
+  if(adminUserSearchHint){
+    adminUserSearchHint.textContent = `Resultater: ${shown.length}`;
+  }
+} else {
+  shown = users.slice(0, 3);
+  if(adminUserSearchHint){
+    adminUserSearchHint.textContent = `Viser ${shown.length} af ${users.length}. Søg for at finde flere.`;
+  }
+}
+
+    adminUsersBox.innerHTML = shown.map(u => `
+  <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px dashed rgba(255,255,255,.14);">
+    <div><b>ID:</b> ${esc(u.id)}</div>
+    <div><b>Brugernavn:</b> ${esc(u.username)}</div>
+    <div><b>Rolle:</b> ${esc(u.role)}</div>
+
+    <div><b>Virksomhed:</b> ${esc(u.companyName || u.company_name || "—")}</div>
+    <div><b>CVR:</b> ${esc(u.cvr || "—")}</div>
+    <div><b>Adresse:</b> ${esc(u.companyAddress || u.company_address || "—")}</div>
+    <div style="margin-top:6px;">
+      <b>Kontakt:</b> ${esc(u.contactName || u.contact_name || "—")}
+      ${(u.contactPhone || u.contact_phone) ? ` · ${esc(u.contactPhone || u.contact_phone)}` : ""}
+      ${(u.contactEmail || u.contact_email) ? ` · ${esc(u.contactEmail || u.contact_email)}` : ""}
+    </div>
+
+    <div class="doc-muted">
+      <b>Oprettet:</b> ${
+        (u.created_at || u.createdAt)
+          ? new Date(u.created_at || u.createdAt).toLocaleString("da-DK")
+          : "—"
+      }
+    </div>
+
+    <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn" type="button" onclick="adminViewUserPolicies('${esc(u.id)}','${esc(u.username)}')">Policer</button>
+      <button class="btn" type="button" onclick="adminResetPassword('${esc(u.id)}','${esc(u.username)}')">Nulstil password</button>
+      <button class="btn" type="button" onclick="toggleUserEdit('${esc(u.id)}')">Redigér info</button>
+      <button class="btn danger" type="button" onclick="adminDeleteUser('${esc(u.id)}','${esc(u.username)}')">Slet</button>
+    </div>
+
+    <!-- ✅ EDIT PANEL -->
+    <div id="editUser_${esc(u.id)}" class="hint hidden" style="margin-top:10px;">
+      <div class="small"><b>Opdatér virksomhedsoplysninger</b></div>
+
+      <div class="row" style="gap:10px; flex-wrap:wrap; margin-top:8px;">
+        <input id="eu_company_${esc(u.id)}" placeholder="Virksomhedsnavn" value="${esc(u.companyName || u.company_name || "")}">
+        <input id="eu_cvr_${esc(u.id)}" placeholder="CVR" value="${esc(u.cvr || "")}">
+      </div>
+
+      <div class="row" style="gap:10px; flex-wrap:wrap;">
+        <input id="eu_addr_${esc(u.id)}" placeholder="Adresse" style="flex:1; min-width:320px;" value="${esc(u.companyAddress || u.company_address || "")}">
+      </div>
+
+      <div class="small" style="margin-top:10px;"><b>Kontaktperson</b></div>
+      <div class="row" style="gap:10px; flex-wrap:wrap; margin-top:8px;">
+        <input id="eu_cname_${esc(u.id)}" placeholder="Kontakt navn" value="${esc(u.contactName || u.contact_name || "")}">
+        <input id="eu_cphone_${esc(u.id)}" placeholder="Kontakt tlf." value="${esc(u.contactPhone || u.contact_phone || "")}">
+        <input id="eu_cmail_${esc(u.id)}" placeholder="Kontakt e-mail" value="${esc(u.contactEmail || u.contact_email || "")}">
+      </div>
+
+      <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn primary" type="button" onclick="saveUserInfo('${esc(u.id)}')">Gem</button>
+        <button class="btn" type="button" onclick="toggleUserEdit('${esc(u.id)}')">Annullér</button>
+      </div>
+    </div>
+  </div>
+`).join("");
+
+  } catch(err){
+    adminUsersBox.innerHTML = `Kunne ikke hente brugere: ${esc(err?.message || String(err))}`;
+  }
+}
+
+createUserBtn?.addEventListener("click", async () => {
+  if(!newUsername || !newPassword || !newRole) return;
+  const username = (newUsername.value || "").trim();
+  const password = newPassword.value || "";
+  const role = newRole.value || "user";
+const companyName    = (newCompanyName?.value || "").trim();
+  const cvr            = (newCVR?.value || "").trim();
+  const companyAddress = (newCompanyAddress?.value || "").trim();
+  const contactName    = (newContactName?.value || "").trim();
+  const contactPhone   = (newContactPhone?.value || "").trim();
+  const contactEmail   = (newContactEmail?.value || "").trim();
+
+  if(!username || !password){
+    showAdminUserToast("Udfyld brugernavn og password.", true);
+    return;
+  }
+  if(password.length < 6){
+    showAdminUserToast("Password skal være mindst 6 tegn.", true);
+    return;
+  }
+
+try{
+  await api("/api/admin/users", {
+    method: "POST",
+    body: {
+      username,
+      password,
+      role,
+      companyName,
+      cvr,
+      companyAddress,
+      contactName,
+      contactPhone,
+      contactEmail
+    }
+  });
+
+  showAdminUserToast(`Bruger oprettet: ${username}`);
+
+    // ✅ nulstil felter
+    newUsername.value = "";
+    newPassword.value = "";
+    newRole.value = "user";
+
+    if(newCompanyName) newCompanyName.value = "";
+    if(newCVR) newCVR.value = "";
+    if(newCompanyAddress) newCompanyAddress.value = "";
+    if(newContactName) newContactName.value = "";
+    if(newContactPhone) newContactPhone.value = "";
+    if(newContactEmail) newContactEmail.value = "";
+
+    await renderAdminUsers();
+  } catch(err){
+    showAdminUserToast("Kunne ikke oprette bruger: " + (err?.message || err), true);
+  }
+});
+
+async function renderSpecialRequests(){
+  if(!specialBox || !specialTable || !specialTbody) return;
+  if(currentUser?.role !== "admin") return;
+
+  specialBox.style.display = "block";
+  specialTable.style.display = "none";
+  specialBox.innerHTML = "Indlæser…";
+
+  try{
+    const out = await api("/api/admin/quotes/pending", { method:"GET" });
+    const quotes = out?.quotes || [];
+
+    if(quotes.length === 0){
+      specialBox.innerHTML = "Ingen specielle forespørgsler lige nu.";
+      return;
+    }
+
+    specialTbody.innerHTML = quotes.map(q => {
+      // Vis transportinfo simpelt (du kan udvide efter hvad der ligger i q.data)
+      const d = q.data || {};
+      const transportTxt = [
+        (d.fromCountry || d.fromCity) ? `Fra: ${esc(d.fromCountry || "")} ${esc(d.fromCity || "")}` : null,
+  (d.toCountry || d.toCity) ? `Til: ${esc(d.toCountry || "")} ${esc(d.toCity || "")}` : null,
+  d.goodsGroup ? `Varegruppe: ${esc(d.goodsGroup)}` : null,
+  d.sumInsured ? `Sum: DKK ${Number(d.sumInsured).toLocaleString("da-DK")}` : null,
+d.deductible != null ? `Selvrisiko: ${fmtDKK(d.deductible)}` : null,
+  d.transportMode ? `Mode: ${esc(d.transportMode)}` : null
+].filter(Boolean).join("<br/>") || "—";
+
+      return `
+        <tr>
+          <td>${esc(q.owner || ("ID "+q.owner_id))}</td>
+          <td>${esc(q.id)}</td>
+          <td class="small">${transportTxt}</td>
+          <td style="min-width:160px;">
+            <input type="number" min="1" step="1" id="prem_${esc(q.id)}" placeholder="fx 12500" />
+          </td>
+          <td style="min-width:160px;">
+            <button class="btn primary" type="button" onclick="adminSetSpecialPremium('${esc(q.id)}')">Send tilbud</button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+
+    specialBox.style.display = "none";
+    specialTable.style.display = "table";
+  } catch(err){
+    specialBox.innerHTML = "Fejl: " + esc(err.message);
+  }
+}
+
+window.adminSetSpecialPremium = async function(quoteId){
+  const inp = document.getElementById(`prem_${quoteId}`);
+  const premium = Number(inp?.value || 0);
+
+  if(!premium || premium <= 0){
+    alert("Angiv en gyldig præmie.");
+    return;
+  }
+
+  try{
+    await api(`/api/admin/quotes/${quoteId}/set-premium`, {
+      method:"POST",
+      body: { premium }
+    });
+
+    alert("Tilbud sendt ✅ (kunden kan nu acceptere i historik)");
+    await renderSpecialRequests();
+    // bonus: admin history refresh hvis du vil
+    if(typeof renderHistory === "function") await renderHistory();
+  } catch(err){
+    alert("Fejl: " + (err?.message || err));
+  }
+};
+window.adminViewUserQuotes = async function(userId, username){
+  const adminUserDetailsBox = document.getElementById("adminUserDetailsBox");
+  if(!adminUserDetailsBox) return;
+
+  adminUserDetailsBox.innerHTML = `Indlæser quotes for <b>${esc(username)}</b>...`;
+
+  try{
+    const out = await api(`/api/admin/users/${userId}/quotes`, { method: "GET" });
+    const quotes = out?.quotes || [];
+
+    if(quotes.length === 0){
+      adminUserDetailsBox.innerHTML = `Ingen quotes for <b>${esc(username)}</b>.`;
+      return;
+    }
+
+    adminUserDetailsBox.innerHTML = `
+      <div><b>Quotes for ${esc(username)}</b></div>
+      <div style="margin-top:10px; overflow:auto;">
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Status</th>
+              <th>Præmie</th>
+              <th>Oprettet</th>
+              <th>Policy nr.</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${quotes.map(q => `
+              <tr>
+                <td>${esc(q.id)}</td>
+                <td>${esc(q.status)}</td>
+                <td>${q.premium ? "DKK " + Number(q.premium).toLocaleString("da-DK") : "—"}</td>
+                <td>${q.created_at ? new Date(q.created_at).toLocaleString("da-DK") : "—"}</td>
+                <td>${esc(q.policy_number || "—")}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+  } catch(err){
+    adminUserDetailsBox.innerHTML = `Fejl: ${esc(err?.message || String(err))}`;
+  }
+};
+
+window.adminViewUserPolicies = async function(userId, username){
+  const adminUserDetailsBox = document.getElementById("adminUserDetailsBox");
+  if(!adminUserDetailsBox) return;
+
+  adminUserDetailsBox.innerHTML = `Indlæser policer for <b>${esc(username)}</b>...`;
+
+  try{
+    const out = await api(`/api/admin/users/${userId}/policies`, { method: "GET" });
+    const policies = out?.policies || [];
+
+    if(policies.length === 0){
+      adminUserDetailsBox.innerHTML = `Ingen policer for <b>${esc(username)}</b>.`;
+      return;
+    }
+
+    adminUserDetailsBox.innerHTML = `
+      <div><b>Policer for ${esc(username)}</b></div>
+      <div style="margin-top:10px; overflow:auto;">
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>Policy nr.</th>
+              <th>Præmie</th>
+              <th>Udstedt</th>
+              <th>Handling</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${policies.map(p => `
+              <tr>
+                <td>${esc(p.policy_number || "—")}</td>
+                <td>${p.premium ? "DKK " + Number(p.premium).toLocaleString("da-DK") : "—"}</td>
+                <td>${p.issued_at ? new Date(p.issued_at).toLocaleString("da-DK") : "—"}</td>
+                <td>
+                  <button class="btn danger" type="button"
+                    onclick="adminDeletePolicy('${esc(p.id)}','${esc(p.policy_number || "")}','${esc(userId)}','${esc(username)}')">
+                    Slet
+                  </button>
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+  } catch(err){
+    adminUserDetailsBox.innerHTML = `Fejl: ${esc(err?.message || String(err))}`;
+  }
+};
+
+window.adminResetPassword = async function(userId, username){
+  const pw = prompt(`Nyt password til ${username} (min. 6 tegn):`);
+  if(!pw) return;
+  if(pw.length < 6){
+    alert("Password skal være mindst 6 tegn.");
+    return;
+  }
+
+  try{
+    await api(`/api/admin/users/${userId}/reset-password`, {
+      method: "POST",
+      body: { password: pw }
+    });
+    alert("Password nulstillet ✅");
+  } catch(err){
+    alert("Fejl: " + (err?.message || err));
+  }
+};
+
+window.toggleUserEdit = function(userId){
+  const box = document.getElementById(`editUser_${userId}`);
+  box?.classList.toggle("hidden");
+};
+
+window.saveUserInfo = async function(userId){
+  const companyName    = (document.getElementById(`eu_company_${userId}`)?.value || "").trim();
+  const cvr            = (document.getElementById(`eu_cvr_${userId}`)?.value || "").trim();
+  const companyAddress = (document.getElementById(`eu_addr_${userId}`)?.value || "").trim();
+  const contactName    = (document.getElementById(`eu_cname_${userId}`)?.value || "").trim();
+  const contactPhone   = (document.getElementById(`eu_cphone_${userId}`)?.value || "").trim();
+  const contactEmail   = (document.getElementById(`eu_cmail_${userId}`)?.value || "").trim();
+
+  try{
+    await api(`/api/admin/users/${userId}`, {
+      method: "PUT",
+      body: { companyName, cvr, companyAddress, contactName, contactPhone, contactEmail }
+    });
+
+    if(typeof showAdminUserToast === "function") showAdminUserToast("Bruger opdateret ✅");
+    await renderAdminUsers(); // refresh liste så du ser nye værdier
+  } catch(err){
+    if(typeof showAdminUserToast === "function") showAdminUserToast("Kunne ikke opdatere: " + (err?.message || err), true);
+    else alert("Kunne ikke opdatere: " + (err?.message || err));
+  }
+};
+
+window.adminDeleteUser = async function(userId, username){
+  const ok = confirm(`Vil du slette brugeren "${username}"?\n\nDette sletter også deres quotes/policer (i demo).`);
+  if(!ok) return;
+
+  try{
+    await api(`/api/admin/users/${userId}`, { method: "DELETE" });
+    alert("Bruger slettet ✅");
+    await renderAdminUsers();
+  } catch(err){
+    alert("Fejl: " + (err?.message || err));
+  }
+};
+
+window.adminEditUser = function(userId){
+  const u = (window.__adminUsersCache || []).find(x => String(x.id) === String(userId));
+  if(!u) return alert("Bruger ikke fundet.");
+
+  const companyName = prompt("Virksomhedsnavn:", u.companyName || u.company_name || "") ?? "";
+  const cvr = prompt("CVR:", u.cvr || "") ?? "";
+  const companyAddress = prompt("Adresse:", u.companyAddress || u.company_address || "") ?? "";
+  const contactName = prompt("Kontakt navn:", u.contactName || u.contact_name || "") ?? "";
+  const contactPhone = prompt("Kontakt tlf:", u.contactPhone || u.contact_phone || "") ?? "";
+  const contactEmail = prompt("Kontakt email:", u.contactEmail || u.contact_email || "") ?? "";
+
+  (async () => {
+    try{
+      await api(`/api/admin/users/${userId}`, {
+        method: "PUT",
+        body: { companyName, cvr, companyAddress, contactName, contactPhone, contactEmail }
+      });
+      showAdminUserToast("Bruger opdateret ✅");
+      await renderAdminUsers();
+    } catch(err){
+      showAdminUserToast("Kunne ikke opdatere: " + (err?.message || err), true);
+    }
+  })();
+};
+
+window.adminDeletePolicy = async function(policyId, policyNumber, userId, username){
+  if(!confirm(`Vil du slette policen ${policyNumber || ""}?`)) return;
+
+  try{
+    await api(`/api/admin/policies/${policyId}`, { method: "DELETE" });
+    alert("Police slettet ✅");
+
+    if(userId && username && typeof window.adminViewUserPolicies === "function"){
+      await window.adminViewUserPolicies(userId, username);
+    }
+    if(typeof renderHistory === "function") await renderHistory();
+  } catch(err){
+    alert("Fejl: " + (err?.message || err));
+  }
+};
+
+// ✅ Admin – Brugere (Step 2) SLUT
+
+async function renderQuoteBox(){
+  const out = await api("/api/quotes", { method: "GET" });
+  const allQuotes = out?.quotes || [];
+
+  // Backend returnerer allerede kun brugerens egne quotes
+  const latest = allQuotes.sort((a,b) => (b.created_at || 0) - (a.created_at || 0))[0];
+  activeQuote = latest || null;
+
+  acceptQuoteBtn.classList.add("hidden");
+  issuePolicyBtn.classList.add("hidden");
+  printPolicyBtn.classList.add("hidden");
+
+  if(!activeQuote){
+    quoteBox.innerHTML = `Ingen tilbud endnu. Klik <b>“Få tilbud”</b> når alle felter er udfyldt.`;
+    return;
+  }
+
+  if(activeQuote.status === "special_pending"){
+    quoteBox.innerHTML = `
+      <b>Speciel forespørgsel sendt</b><br/>
+      Status: Afventer admin (manuel præmie).<br/>
+      <span class="doc-muted">${(activeQuote.reasons||[]).map(r=>`• ${esc(r)}`).join("<br/>")}</span>
+    `;
+    return;
+  }
+
+  if(activeQuote.status === "offered"){
+    const idx = activeQuote.deductible_index ?? 100;
+    quoteBox.innerHTML = `
+      <b>Tilbud klar</b><br/>
+      Præmie: <b>${fmtDKK(activeQuote.premium)}</b><br/>
+      <span class="doc-muted">Grundpræmie: ${fmtDKK(activeQuote.base_premium)} · Selvrisiko-index: ${idx}</span><br/>
+      Rute/område: ${esc(activeQuote.area || "—")}<br/>
+      Rate: ${activeQuote.rate != null ? (activeQuote.rate*100).toFixed(4) + "%" : "—"}<br/>
+      <span class="doc-muted">Godkend tilbud for at udstede police.</span>
+    `;
+    acceptQuoteBtn.classList.remove("hidden");
+    return;
+  }
+
+  if(activeQuote.status === "accepted"){
+    quoteBox.innerHTML = `
+      <b>Tilbud accepteret</b><br/>
+      Præmie: <b>${fmtDKK(activeQuote.premium)}</b><br/>
+      Du kan nu udstede policen.
+    `;
+    issuePolicyBtn.classList.remove("hidden");
+    return;
+  }
+
+  if(activeQuote.status === "issued"){
+    quoteBox.innerHTML = `
+      <b>Police udstedt</b><br/>
+      Policenr.: <b>${esc(activeQuote.policy_number || "—")}</b><br/>
+      Præmie: <b>${fmtDKK(activeQuote.premium)}</b><br/>
+      Klar til print/PDF.
+    `;
+    printPolicyBtn.classList.remove("hidden");
+    return;
+  }
+}
+
+async function renderHistory(){
+  if(!historyBox || !historyTable || !historyTbody) return;
+
+  const isAdmin = currentUser?.role === "admin";
+
+  // loading
+  historyBox.style.display = "block";
+  historyTable.style.display = "none";
+  historyBox.innerHTML = "Indlæser...";
+
+  // Titel
+  const h2 = document.querySelector("#historyView .hd h2");
+  if(h2) h2.textContent = isAdmin ? "Udstedte policer" : "Mine vareforsikringer";
+
+  try{
+    // -------------------------
+    // USER: behold din gamle tabel (quotes + policies)
+    // -------------------------
+    if(!isAdmin){
+      const qOut = await api("/api/quotes", { method:"GET" });
+      const quotes = qOut?.quotes || [];
+
+      const pOut = await api("/api/policies", { method:"GET" });
+      const policies = pOut?.policies || [];
+window._myPoliciesCache = policies;
+
+      const rows = [];
+
+      for(const p of policies){
+        rows.push({
+          type: "Police",
+          status: "issued",
+          owner: "—",
+          id: p.id,
+          policy: p.policy_number || "—",
+          premium: p.premium ? "DKK " + Number(p.premium).toLocaleString("da-DK") : "—",
+          time: p.issued_at ? new Date(p.issued_at).toLocaleString("da-DK") : "—",
+          canDelete: false
+        });
+      }
+
+      if(rows.length === 0){
+        historyBox.innerHTML = "Du har ingen tidligere tilbud eller policer endnu.";
+        historyBox.style.display = "block";
+        historyTable.style.display = "none";
+        return;
+      }
+
+window.acceptFromHistory = async function(quoteId){
+  try{
+    await api(`/api/quotes/${quoteId}/accept`, { method:"POST" });
+    alert("Tilbud accepteret ✅");
+    await renderHistory();
+    if(typeof renderQuoteBox === "function") await renderQuoteBox();
+  } catch(err){
+    alert("Fejl ved accept: " + (err?.message || err));
+  }
+};
+     // Table headers (user)
+const theadRow = historyTable.querySelector("thead tr");
+theadRow.innerHTML = `
+  <th>Type</th><th>Status</th><th>Police nr.</th><th>Præmie</th><th>Oprettet/Udstedt</th><th>Handling</th>
+`;
+
+historyTbody.innerHTML = rows.map(r => `
+
+  <tr>
+    <td>${esc(r.type)}</td>
+    <td>${esc(r.status)}</td>
+    <td>${esc(r.policy)}</td>
+    <td>${esc(r.premium)}</td>
+    <td>${esc(r.time)}</td>
+    <td>
+      ${
+    r.type === "Quote" && r.status === "offered"
+      ? `<button class="btn primary" type="button" onclick="acceptFromHistory('${esc(r.id)}')">Accepter</button>`
+      : r.type === "Police"
+        ? `<button class="btn" type="button" onclick="viewPolicyFromHistory('${esc(r.id)}')">Se police</button>`
+        : "—"
+    }
+    </td>
+  </tr>
+`).join("");
+historyBox.style.display = "none";
+      historyTable.style.display = "table";
+      return;
+    }
+
+    // -------------------------
+    // ADMIN: kun policer, grupperet pr. bruger
+    // -------------------------
+    const out = await api("/api/admin/policies", { method:"GET" });
+    const policies = out?.policies || [];
+// ✅ Dato-filter (fra/til)
+const fromVal = document.getElementById("polFrom")?.value;
+const toVal   = document.getElementById("polTo")?.value;
+
+let filtered = policies;
+
+if(fromVal){
+  const from = new Date(fromVal + "T00:00:00").getTime();
+  filtered = filtered.filter(p => (p.issued_at || 0) >= from);
+}
+if(toVal){
+  const to = new Date(toVal + "T23:59:59").getTime();
+  filtered = filtered.filter(p => (p.issued_at || 0) <= to);
+}
+
+// Brug filtered fremfor policies resten af vejen
+if(filtered.length === 0){
+  historyBox.innerHTML = "Ingen udstedte policer i det valgte tidsrum.";
+  historyBox.style.display = "block";
+  historyTable.style.display = "none";
+  return;
+}
+
+// Gruppér pr. bruger (brug filtered)
+const byOwner = new Map();
+for(const p of filtered){
+  const owner = p.owner || `Bruger #${p.owner_id}`;
+  if(!byOwner.has(owner)) byOwner.set(owner, []);
+  byOwner.get(owner).push(p);
+}
+    if(policies.length === 0){
+      historyBox.innerHTML = "Der er ingen udstedte policer endnu.";
+      historyBox.style.display = "block";
+      historyTable.style.display = "none";
+      return;
+    }
+
+    // Render cards pr. bruger
+    historyBox.innerHTML = [...byOwner.entries()].map(([owner, list]) => {
+      const rows = list.map(p => `
+        <tr>
+          <td>${esc(p.policy_number || "—")}</td>
+          <td>${p.premium ? "DKK " + Number(p.premium).toLocaleString("da-DK") : "—"}</td>
+          <td>${p.issued_at ? new Date(p.issued_at).toLocaleString("da-DK") : "—"}</td>
+          <td>
+            <button class="btn danger" type="button"
+              onclick="adminDeletePolicy('${esc(p.id)}')">Slet</button>
+          </td>
+        </tr>
+      `).join("");
+
+      return `
+        <div class="card" style="margin-top:12px;">
+          <div class="small"><b>${esc(owner)}</b></div>
+          <table class="table" style="margin-top:8px;">
+            <thead>
+              <tr><th>Police nr.</th><th>Præmie</th><th>Udstedt</th><th>Handling</th></tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }).join("");
+
+    historyBox.style.display = "block";
+    historyTable.style.display = "none";
+
+  } catch(err){
+    historyBox.innerHTML = "Fejl: " + esc(err?.message || err);
+    historyBox.style.display = "block";
+    historyTable.style.display = "none";
+  }
+}
+
+window.acceptFromHistory = async function(quoteId){
+  try{
+    await api(`/api/quotes/${quoteId}/accept`, { method:"POST" });
+    alert("Tilbud accepteret ✅");
+    await renderHistory();
+    if(typeof renderQuoteBox === "function") await renderQuoteBox();
+  } catch(err){
+    alert("Fejl ved accept: " + (err?.message || err));
+  }
+};
+
+window.viewPolicyFromHistory = async function(policyId){
+  try{
+    // vi bruger cache fra renderHistory (se næste step)
+    let p = (window._myPoliciesCache || []).find(x => x.id === policyId);
+
+    // fallback: hvis cache ikke findes, hent alle igen
+    if(!p){
+      const pOut = await api("/api/policies", { method:"GET" });
+      window._myPoliciesCache = pOut?.policies || [];
+      p = window._myPoliciesCache.find(x => x.id === policyId);
+    }
+
+    if(!p){
+      alert("Police ikke fundet.");
+      return;
+    }
+
+    // openPolicyPrintView forventer et “quote-lignende” objekt
+    openPolicyPrintView({
+      data: p.data,
+      premium: p.premium,
+      policy_number: p.policy_number,
+      issued_at: p.issued_at
+    });
+
+  } catch(err){
+    alert("Fejl ved visning af police: " + (err?.message || err));
+  }
+};
+
+async function apiForm(url, formData){
+  const token = getToken();
+  const res = await fetch(API_BASE + url, {
+    method: "POST",
+    headers: { "Authorization": "Bearer " + token },
+    body: formData
+  });
+  const data = await res.json().catch(() => ({}));
+  if(!res.ok) throw new Error(data?.error || "Request failed");
+  return data;
+}
+
+function showClaimToast(msg, ok=true){
+  if(!claimToast) return;
+  claimToast.style.display = "block";
+  claimToast.textContent = msg;
+  claimToast.style.opacity = "1";
+  claimToast.style.border = ok ? "1px solid rgba(40,200,120,.35)" : "1px solid rgba(255,80,80,.35)";
+  setTimeout(() => { claimToast.style.opacity = "0.0"; }, 4500);
+}
+
+function clearClaimFiles(){
+  if(claimFiles) claimFiles.value = "";
+  if(claimFilesHint) claimFilesHint.textContent = "";
+}
+
+claimFiles?.addEventListener("change", () => {
+  const n = claimFiles.files?.length || 0;
+  claimFilesHint.textContent = n ? `${n} fil(er) valgt` : "";
+});
+
+claimResetBtn?.addEventListener("click", () => {
+  claimForm?.reset();
+  clearClaimFiles();
+  showClaimToast("Nulstillet.", true);
+});
+
+claimForm?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const fd = new FormData();
+  fd.append("policyholder", document.getElementById("claimPolicyholder").value.trim());
+  fd.append("name", document.getElementById("claimName").value.trim());
+  fd.append("cvr", document.getElementById("claimCvr").value.trim());
+  fd.append("policyNo", document.getElementById("claimPolicyNo").value.trim());
+  fd.append("email", document.getElementById("claimEmail").value.trim());
+  fd.append("phone", document.getElementById("claimPhone").value.trim());
+  fd.append("date", document.getElementById("claimDate").value);
+  fd.append("description", document.getElementById("claimDesc").value.trim());
+
+  // files (valgfri)
+  const files = claimFiles?.files || [];
+  for(const f of files){
+    fd.append("attachments", f);
+  }
+
+  try{
+    await apiForm("/api/claims", fd);
+    showClaimToast("Skaden er sendt ✅", true);
+    claimForm.reset();
+    clearClaimFiles();
+  } catch(err){
+    showClaimToast("Fejl: " + (err?.message || err), false);
+  }
+});
+
+async function renderAdminBox(){
+  const isAdmin = currentUser?.role === "admin";
+  if(!isAdmin){
+    adminBox.innerHTML = "";
+    return;
+  }
+
+  if(!isAdmin) return;
+
+ const out = await api("/api/admin/quotes/pending", { method: "GET" });
+const pending = out?.quotes || [ ];
+
+  if(pending.length === 0){
+    adminBox.innerHTML = "Ingen specielle forespørgsler.";
+    return;
+  }
+
+  adminBox.innerHTML = pending.map(q => {
+    return `
+      <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px dashed rgba(255,255,255,.14);">
+        <div><b>Request:</b> ${esc(q.id)}</div>
+        <div><b>Kunde:</b> ${esc(q.owner)}</div>
+        <div><b>Sum:</b> ${fmtDKK(q.data?.sumInsured)}</div>
+<div><b>Selvrisiko:</b> ${fmtDKK(q.data?.deductible)}</div>
+        <div><b>Årsager:</b><br/>${(q.reasons||[]).map(r=>`• ${esc(r)}`).join("<br/>")}</div>
+        <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+          <input class="btn" style="padding:10px 12px; border-radius:12px; width:160px;" 
+                 type="number" min="0" step="1" id="prem_${q.id}" placeholder="Præmie DKK" />
+          <button class="btn primary" type="button" onclick="adminSetPremium('${q.id}')">Sæt præmie & send tilbud</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+// gør funktionen global til onclick
+window.adminSetPremium = async function(id){
+  const input = document.getElementById(`prem_${id}`);
+  const prem = Number(input?.value || 0);
+
+  if(!prem || prem <= 0){
+    alert("Angiv en gyldig præmie (DKK).");
+    return;
+  }
+
+  try{
+    await api(`/api/admin/quotes/${id}/set-premium`, {
+      method: "POST",
+      body: { premium: prem }
+    });
+
+    alert("Tilbud sendt ✅");
+    await renderAdminBox();
+    await renderQuoteBox(); // hvis admin også vil se sin egen quote box opdatere
+  } catch(err){
+    alert("Fejl ved sæt præmie: " + (err?.message || err));
+  }
+};
+
+ // ✅ lukker issuePolicyBtn korrekt
+
+function openPolicyPrintView(q){
+  const d = q.data || {};
+  const isTransport = d.insuranceType === "transport";
+const policyNo = q.policyNumber || q.policy_number || "—";
+  const issuedAt = q.issuedAt || q.issued_at || Date.now();
+
+  // Vi bruger samme “hvide dokument-layout” som din docPreview, men med præmie/policenr.
+  const html = `
+  <html>
+    <head>
+      <meta charset="utf-8"/>
+              <title>Police ${esc(policyNo)}</title>
+      <style>
+        body{ margin:24px; font-family: Arial, Helvetica, sans-serif; color:#111; }
+        .doc{ max-width: 900px; margin:0 auto; border:1px solid rgba(0,0,0,.12); border-radius:14px; padding:18px; }
+        .top{ font-size:12px; color:#222; }
+        .hr{ height:1px; background:rgba(0,0,0,.18); margin:12px 0; }
+        .grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+        @media print { button{display:none;} body{margin:0;} .doc{border:none;} }
+        h1{ font-size:16px; margin:0; }
+        h4{ margin:0 0 6px; font-size:12px; }
+        p{ margin:0; font-size:12px; line-height:1.35; }
+        .muted{ color:#444; font-size:11px; }
+        table{ width:100%; border-collapse:collapse; font-size:12px; }
+        th,td{ border-bottom:1px solid rgba(0,0,0,.12); padding:8px 6px; text-align:left; vertical-align:top; }
+      </style>
+    </head>
+    <body>
+      <button onclick="window.print()" style="padding:10px 12px;border-radius:10px;border:1px solid #ccc;background:#f6f6f6;cursor:pointer;">Print / Gem som PDF</button>
+      <div class="doc">
+        <div class="top">
+          <h1>CargoSafe – Forsikringspolice</h1>
+          <div class="muted">Police nr.: <b>${esc(policyNo)}</b> · Udstedt: ${new Date(issuedAt).toLocaleDateString("da-DK")} </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="grid">
+          <div>
+            <h4>Ordregiver / Forsikrede</h4>
+            <p>${esc(d.insured||"—")}</p>
+            <div class="hr"></div>
+            <h4>Adresse</h4>
+            <p>${esc(d.address||"—")}<br/>${esc(d.zipCity||"")}<br/>${esc(d.country||"")}</p>
+          </div>
+          <div>
+            <h4>Præmie</h4>
+            <p><b>${fmtDKK(q.premium)}</b></p>
+            <p class="muted">Tilbud godkendt: ${q.acceptedAt ? new Date(q.acceptedAt).toLocaleDateString("da-DK") : "—"}</p>
+            <div class="hr"></div>
+            <h4>Intern reference</h4>
+            <p>${esc(d.internalRef||"—")}</p>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Dokument</th>
+              <th>Special condition</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${esc(d.bl||"—")}</td>
+              <td>${esc(d.specialConditions||"—")}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        ${isTransport ? `
+        <div class="hr"></div>
+        <div class="grid">
+          <div>
+            <h4>Fra</h4>
+            <p>${esc(d.fromCountry||"—")}<br/>${esc(d.fromCity||"")}</p>
+          </div>
+          <div>
+            <h4>Til</h4>
+            <p>${esc(d.toCountry||"—")}<br/>${esc(d.toCity||"")}</p>
+          </div>
+        </div>
+        <div class="grid" style="margin-top:12px;">
+          <div>
+            <h4>Via</h4>
+            <p>${esc(d.viaCountry||"—")}<br/>${esc(d.viaCity||"")}</p>
+          </div>
+          <div>
+            <h4>Afgangsdato / Transportform / Incoterms</h4>
+            <p>${esc(d.departureDate||"—")}<br/>${esc(d.transportMode||"—")}<br/>${esc(d.incoterms||"—")}</p>
+          </div>
+        </div>
+        ` : ""}
+
+        <div class="hr"></div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Varegruppe</th>
+              <th>Forsikringssum</th>
+              <th>Selvrisiko</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${esc(d.goodsGroup||"—")}</td>
+              <td><b>${fmtDKK(d.sumInsured)}</b></td>
+              <td>${d.deductible ? `DKK ${Number(d.deductible).toLocaleString("da-DK")}` : "—"}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="hr"></div>
+
+        <h4>Varebeskrivelse</h4>
+        <p>${esc(d.goodsDesc||"—").replaceAll("\n","<br/>")}</p>
+
+        <div class="hr"></div>
+        <p class="muted">Bemærk: Dette er en demo-police genereret i frontend. Produktion kræver backend, brugerhåndtering og journalisering.</p>
+      </div>
+    </body>
+  </html>`;
+
+  const w = window.open("", "_blank");
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+}
+
+  function getFormData(){
+    const fd = new FormData(form);
+    const obj = {};
+    fd.forEach((v,k) => { obj[k] = v; });
+
+    obj.insuranceType = insuranceType;
+
+    // transport mode: (radio) might be absent if ophold
+    const tm = form.querySelector('input[name="transportMode"]:checked');
+    obj.transportMode = tm ? tm.value : "";
+
+    return obj;
+  }
+
+  function updateFilledKpi(obj){
+    const values = Object.entries(obj)
+      .filter(([k]) => k !== "insuranceType")
+      .map(([,v]) => (typeof v === "string" ? v.trim() : v))
+      .filter(v => v !== "" && v !== null && v !== undefined);
+
+    // Approx: count filled keys excluding empty
+    kpiFilled.textContent = String(values.length);
+  }
+function updatePreview(){
+  const obj = getFormData();
+
+  const isTransport = insuranceType === "transport";
+  const viewObj = structuredClone(obj);
+
+  if(!isTransport){
+    delete viewObj.incoterms;
+    delete viewObj.departureDate;
+    delete viewObj.fromCountry;
+    delete viewObj.fromCity;
+    delete viewObj.viaCountry;
+    delete viewObj.viaCity;
+    delete viewObj.toCountry;
+    delete viewObj.toCity;
+    delete viewObj.transportMode;
+  }
+
+  updateFilledKpi(viewObj);
+
+  // JSON
+  if(preview) preview.textContent = JSON.stringify(viewObj, null, 2);
+
+  // Dokument-preview
+  const doc = document.getElementById("docPreview");
+  if(!doc){
+    console.warn("docPreview mangler");
+    return;
+  }
+
+  const insured = esc(viewObj.insured || "");
+  const address = esc(viewObj.address || "");
+  const zipCity = esc(viewObj.zipCity || "");
+  const country = esc(viewObj.country || "");
+  const bl = esc(viewObj.bl || "");
+  const internalRef = esc(viewObj.internalRef || "");
+  const goodsGroup = esc(viewObj.goodsGroup || "");
+  const goodsDesc = esc(viewObj.goodsDesc || "");
+  const special = esc(viewObj.specialConditions || "");
+  const sum = viewObj.sumInsured || "";
+  const ded = viewObj.deductible ? `DKK ${Number(viewObj.deductible).toLocaleString("da-DK")}` : "";
+
+  const inc = esc(viewObj.incoterms || "");
+  const dep = esc(viewObj.departureDate || "");
+  const fromC = esc(viewObj.fromCountry || "");
+  const fromCity = esc(viewObj.fromCity || "");
+  const viaC = esc(viewObj.viaCountry || "");
+  const viaCity = esc(viewObj.viaCity || "");
+  const toC = esc(viewObj.toCountry || "");
+  const toCity = esc(viewObj.toCity || "");
+  const mode = esc(viewObj.transportMode || "");
+
+  const titleLine = isTransport
+    ? "CargoSafe – Transportforsikring (vareforsikring)"
+    : "CargoSafe – Opholdsforsikring";
+
+  let routeHtml = "";
+  if(isTransport){
+    routeHtml = `
+      <div class="doc-hr"></div>
+      <div class="doc-grid">
+        <div class="doc-block">
+          <h4>Fra</h4>
+          <p>${fromC}${fromCity ? "<br/>" + fromCity : ""}</p>
+        </div>
+        <div class="doc-block">
+          <h4>Til</h4>
+          <p>${toC}${toCity ? "<br/>" + toCity : ""}</p>
+        </div>
+      </div>
+
+      <div class="doc-grid" style="margin-top:12px;">
+        <div class="doc-block">
+          <h4>Via</h4>
+          <p>${viaC ? viaC : "<span class='doc-muted'>—</span>"}${viaCity ? "<br/>" + viaCity : ""}</p>
+        </div>
+        <div class="doc-block">
+          <h4>Afgangsdato / Transportform</h4>
+          <p>${dep ? dep : "<span class='doc-muted'>—</span>"}<br/>${mode ? mode : "<span class='doc-muted'>—</span>"}</p>
+        </div>
+      </div>
+
+      <div class="doc-hr"></div>
+
+      <table class="doc-table">
+        <thead>
+          <tr>
+            <th>Dokument</th>
+            <th>Incoterms</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>${bl ? bl : "<span class='doc-muted'>—</span>"}</td>
+            <td>${inc ? inc : "<span class='doc-muted'>—</span>"}</td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+  } else {
+    routeHtml = `
+      <div class="doc-hr"></div>
+      <table class="doc-table">
+        <thead>
+          <tr>
+            <th>Bill of Lading / Fragtbrevs nr.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>${bl ? bl : "<span class='doc-muted'>—</span>"}</td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+  }
+
+  doc.innerHTML = `
+    <div class="doc-topline">
+      <b>${titleLine}</b><br/>
+      <span class="doc-muted">Forhåndsvisning – genereret ud fra formularen</span>
+    </div>
+
+    <div class="doc-hr"></div>
+
+    <div class="doc-grid">
+      <div class="doc-block">
+        <h4>Ordregiver / forsikrede</h4>
+        <p>${insured || "<span class='doc-muted'>—</span>"}</p>
+      </div>
+      <div class="doc-block">
+        <h4>Intern reference</h4>
+        <p>${internalRef || "<span class='doc-muted'>—</span>"}</p>
+      </div>
+    </div>
+
+    <div class="doc-grid" style="margin-top:12px;">
+      <div class="doc-block">
+        <h4>Adresse</h4>
+        <p>${address || "<span class='doc-muted'>—</span>"}<br/>${zipCity || ""}<br/>${country || ""}</p>
+      </div>
+      <div class="doc-block">
+        <h4>Special condition</h4>
+        <p>${special || "<span class='doc-muted'>—</span>"}</p>
+      </div>
+    </div>
+
+    ${routeHtml}
+
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th>Varegruppe</th>
+          <th>Forsikringssum</th>
+          <th>Selvrisiko</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>${goodsGroup || "<span class='doc-muted'>—</span>"}</td>
+          <td>${sum ? "DKK " + Number(sum).toLocaleString("da-DK") : "<span class='doc-muted'>—</span>"}</td>
+          <td>${ded || "<span class='doc-muted'>—</span>"}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="doc-hr"></div>
+
+    <div class="doc-block">
+      <h4>Varebeskrivelse</h4>
+      <p>${goodsDesc ? goodsDesc.replaceAll("\n","<br/>") : "<span class='doc-muted'>—</span>"}</p>
+    </div>
+  `;
+}
+   form.addEventListener("input", updatePreview);
+
+  form.addEventListener("submit", (e) => {
+  e.preventDefault();
+});
+
+  resetBtn.addEventListener("click", () => {
+    form.reset();
+  deleteDraft(insuranceType);
+    // Reset selects to placeholder
+    ["country","fromCountry","toCountry"].forEach(id => {
+      const sel = document.getElementById(id);
+      if(sel) sel.selectedIndex = 0;
+    });
+    document.getElementById("viaCountry").value = "";
+    setType(insuranceType); // re-apply required fields
+    updatePreview();
+  });
+document.addEventListener("DOMContentLoaded", () => {
+  (function bootAuth(){
+    const userStr = localStorage.getItem("cs_user");
+    const token = localStorage.getItem("cs_token");
+
+    if(userStr && token){
+      try{
+        currentUser = JSON.parse(userStr);
+        setLoggedIn(currentUser.username);
+        if(typeof renderQuoteBox === "function") renderQuoteBox();
+      } catch {
+        localStorage.removeItem("cs_user");
+        localStorage.removeItem("cs_token");
+        setLoggedOut();
+      }
+    } else {
+      setLoggedOut();
+    }
+  })();
+});
+
+  // init
+  setType("transport");
+  updatePreview();
+</script>
+
+</body>
+</html>
